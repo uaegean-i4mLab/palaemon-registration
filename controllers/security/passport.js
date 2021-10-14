@@ -163,35 +163,8 @@ const getConfiguredPassport = async (serverEndpoint) => {
       fallbackToUserInfoRequest: true,
     },
 
-    function (accessToken, refreshToken, profile, cb) {
-      const options = {
-        hostname: _user_info_request,
-        port: _user_info_port,
-        path: "/auth/realms/grids/protocol/openid-connect/userinfo",
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${accessToken}`,
-          "Content-Length": "0",
-        },
-      };
-      const httpsReq = https.request(options, function (res) {
-        const chunks = [];
-        res.on("data", function (chunk) {
-          chunks.push(chunk);
-        });
-        res.on("end", function () {
-          const body = Buffer.concat(chunks);
-          console.log("******* USER INFO **********************");
-          console.log(body.toString());
-          console.log("******* USER INFO END **********************");
-          const resJson = JSON.parse(body.toString());
-          sendToken(
-            resJson._claim_sources.src1.access_token,
-            resJson._claim_sources.src1.endpoint
-          );
-        });
-      });
-      httpsReq.end();
+    async function (accessToken, refreshToken, profile, cb) {
+      await getDataFromDPs(_user_info_request, _user_info_port, accessToken);
       return cb(null, { profile });
     }
   );
@@ -228,6 +201,8 @@ const getConfiguredPassport = async (serverEndpoint) => {
     },
     passport.authenticate("curity", { failureRedirect: "/login" }), //listens to /login/callback
     (req, res) => {
+      console.log("will now redirect to the view");
+      console.log(req.user);
       res.redirect("/user");
     }
   );
@@ -281,56 +256,95 @@ function getDynClient(redirectURI, jwksURI) {
   });
 }
 
-function sendToken(accessToken, endpoint) {
-  const epParts = endpoint.split("/");
-  const host = epParts[2].split(":")[0];
-  const port = epParts[2].split(":")[1];
-  const path = "/" + epParts[3];
+async function sendToken(accessToken, endpoint) {
+  return new Promise(function (resolve, reject) {
+    const epParts = endpoint.split("/");
+    const host = epParts[2].split(":")[0];
+    const port = epParts[2].split(":")[1];
+    const path = "/" + epParts[3];
 
+    const options = {
+      hostname: host,
+      port: 8050,
+      path: path,
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      console.log("statusCode:", res.statusCode);
+      console.log("headers:", res.headers);
+
+      const chunks = [];
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+      });
+      res.on("end", function () {
+        const body = Buffer.concat(chunks);
+        const payload = body.toString();
+        const ks = fs.readFileSync("keys.json");
+        jose.JWK.asKeyStore(ks.toString()).then(async (keyStore) => {
+          //decrypt received data
+          const decrypted = await JWE.createDecrypt(keyStore).decrypt(payload);
+          const body = Buffer.from(decrypted.plaintext);
+          const resJson = JSON.parse(body.toString());
+          console.log("******* DECRYPTED DP RESPONSE**************");
+          resJson.verified_claims.verified_claims.forEach((element) => {
+            console.log("verified claim found");
+            console.log(element);
+          });
+          // console.log(resJson.verified_claims.verified_claims)
+          console.log("********************************************");
+          // add decrypted data to database
+          //
+          // repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
+          resolve(resJson.verified_claims.verified_claims[0].claims);
+        });
+      });
+    });
+
+    req.on("error", (e) => {
+      console.error(e);
+    });
+    req.end();
+  });
+}
+
+function getDataFromDPs(_user_info_request, _user_info_port, accessToken) {
   const options = {
-    hostname: host,
-    port: 8050,
-    path: path,
+    hostname: _user_info_request,
+    port: _user_info_port,
+    path: "/auth/realms/grids/protocol/openid-connect/userinfo",
     method: "GET",
     headers: {
       Authorization: `Bearer ${accessToken}`,
+      "Content-Length": "0",
     },
   };
-
-  const req = https.request(options, (res) => {
-    console.log("statusCode:", res.statusCode);
-    console.log("headers:", res.headers);
-
-    const chunks = [];
-    res.on("data", function (chunk) {
-      chunks.push(chunk);
-    });
-    res.on("end", function () {
-      const body = Buffer.concat(chunks);
-      const payload = body.toString();
-      const ks = fs.readFileSync("keys.json");
-      jose.JWK.asKeyStore(ks.toString()).then(async (keyStore) => {
-        //decrypt received data
-        const decrypted = await JWE.createDecrypt(keyStore).decrypt(payload);
-        const body = Buffer.from(decrypted.plaintext);
+  return new Promise((resolve, reject) => {
+    const httpsReq = https.request(options, function (res) {
+      const chunks = [];
+      res.on("data", function (chunk) {
+        chunks.push(chunk);
+      });
+      res.on("end", async function () {
+        const body = Buffer.concat(chunks);
+        console.log("******* USER INFO **********************");
+        console.log(body.toString());
+        console.log("******* USER INFO END **********************");
         const resJson = JSON.parse(body.toString());
-        console.log("******* DECRYPTED DP RESPONSE**************")
-        resJson.verified_claims.verified_claims.forEach(element => {
-          console.log("verified claim found")
-          console.log(element)
-        });
-        // console.log(resJson.verified_claims.verified_claims)
-        console.log("********************************************")
-        // add decrypted data to database
-        repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
+        resolve(
+          await sendToken(
+            resJson._claim_sources.src1.access_token,
+            resJson._claim_sources.src1.endpoint
+          )
+        );
       });
     });
+    httpsReq.end();
   });
-
-  req.on("error", (e) => {
-    console.error(e);
-  });
-  req.end();
 }
 
 // Part 4, export objects
