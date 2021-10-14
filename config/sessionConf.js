@@ -16,10 +16,11 @@ const getSessionConfg = (isProduction) => {
   const SESSION_CONF = {
     secret: "this is my super super secret, secret!! shhhh",
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false },
+    saveUninitialized: false,
+    cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
     store: memoryStore,
     maxExpiration: 90000,
+    cookie: { secure: false }
   };
   if (isProduction) {
     console.log(
@@ -27,7 +28,6 @@ const getSessionConfg = (isProduction) => {
     );
     SESSION_CONF.store = cacheStore;
   }
-  // set session managment
   if (process.env.HTTPS_COOKIES === true) {
     SESSION_CONF.cookie.secure = true; // serve secure cookies, i.e. only over https, only for production
   }

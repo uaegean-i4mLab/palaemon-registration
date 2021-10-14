@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ENDPOINT='http://localhost:5000'  nodemon -r esm jolo-server.js",
+    "dev": "ENDPOINT='http://localhost:5000'  node -r esm jolo-server.js",
     "build": "next build",
     "start": "node -r esm server.js",
     "test": "mocha --require esm"
@@ -47,10 +47,14 @@
     "mobile-detect": "^1.4.4",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.31",
+    "mongoose": "^6.0.10",
     "next": "^9.4.4",
     "ngrok": "^3.3.0",
     "node-cache": "^5.1.2",
+    "node-jose": "^2.0.0",
     "node-rsa": "^1.1.1",
+    "passport": "^0.5.0",
+    "passport-curity": "^1.1.0",
     "popper.js": "^1.16.1",
     "qr-image": "^3.2.0",
     "qrcode": "^1.4.4",

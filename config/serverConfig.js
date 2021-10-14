@@ -1,10 +1,15 @@
 const ngrok = require("ngrok");
+const { getConfiguredPassport } = require('../controllers/security/passport');
 
-const configServer = (server, https, port,isProduction, handle, serverConfiguration) => {
-  
-  server.all("*", (req, res) => {
-    return handle(req, res);
-  });
+const configServer = (
+  server,
+  https,
+  port,
+  isProduction,
+  handle,
+  serverConfiguration
+) => {
+
   if (process.env.KEY_PATH && process.env.CERT_PATH && process.env.CERT_PASS) {
     let key = fs.readFileSync(process.env.KEY_PATH);
     let cert = fs.readFileSync(process.env.CERT_PATH);
@@ -27,7 +32,7 @@ const configServer = (server, https, port,isProduction, handle, serverConfigurat
         return serverConfiguration.endpoint;
       });
   } else {
-    server.listen(port, (err) => {
+    server.listen(port, async (err) => {
       if (err) throw err;
 
       if (isProduction) {
@@ -36,9 +41,15 @@ const configServer = (server, https, port,isProduction, handle, serverConfigurat
         );
         serverConfiguration.endpoint = process.env.ENDPOINT;
       } else {
-        ngrok.connect(port).then((ngrokUrl) => {
+        console.log(`running in development`);
+        ngrok.connect(port).then(async (ngrokUrl) => {
           serverConfiguration.endpoint = ngrokUrl;
           console.log(`running, open at ${serverConfiguration.endpoint}`);
+          console.log(`configuring the passport`)
+          const passport = await getConfiguredPassport(
+            ngrokUrl
+          );
+          
           return serverConfiguration.endpoint;
         });
       }

@@ -17,6 +17,7 @@ import {
   handleVCRequestController,
   handleVCResponseController,
 } from "./controllers/jolocom-api-controller";
+import  {jwksController} from './controllers/jwks-controllers';
 import { subscribe } from "./services/sse-service";
 
 const KeycloakMultiRealm = require("./config/KeycloakMultiRealm");
@@ -34,6 +35,10 @@ const axios = require("axios");
 const moment = require("moment");
 const app = next({ dev });
 const handle = app.getRequestHandler();
+const {
+  getConfiguredPassport,
+  passportController,
+} = require("./controllers/security/passport");
 
 // server session cache config
 const isProduction = process.env.NODE_ENV === "production";
@@ -65,12 +70,13 @@ app.prepare().then(async () => {
   server.use(bodyParser.urlencoded({ extended: true }));
   server.use(bodyParser.json({ type: "*/*" }));
   server.use(session(SESSION_CONF));
-  server.use(keycloak.middleware());
+  // server.use(keycloak.middleware());
 
   // initiate the jolocom agent
   const issuerAgent = await initAgent();
 
-  //controllers
+  //CONTROLLERS
+
   //sse
   server.get("/events", subscribe);
 
@@ -88,7 +94,6 @@ app.prepare().then(async () => {
       serverConfiguration.endpoint
     );
   });
-
 
   server.get(["/vc/issue/myID"], async (req, res) => {
     console.log("/vc/issue/myID");
@@ -134,15 +139,27 @@ app.prepare().then(async () => {
   server.post(["/issueVC"], async (req, res) => {
     console.log("/issueVC");
     // console.log(req.body)
-    handleVCRequestController(req, res, issuerAgent,serverConfiguration.endpoint);
+    handleVCRequestController(
+      req,
+      res,
+      issuerAgent,
+      serverConfiguration.endpoint
+    );
   });
 
-  server.post(["/offerResponse"], async (req,res) =>{
+  server.post(["/offerResponse"], async (req, res) => {
     console.log("/offerResponse");
     handleVCResponseController(req, res, issuerAgent);
-  })
+  });
 
   // this call needs to be on the end of the config as, the handle(*,*) must be last
   // otherwise the rest of the controllers are ignored
   configServer(server, https, port, isProduction, handle, serverConfiguration);
+  // grids login flow
+  server.use("/login", passportController);
+  
+  server.use('/jwks', jwksController);
+  server.all("*", async (req, res) => {
+    return handle(req, res);
+  });
 });
