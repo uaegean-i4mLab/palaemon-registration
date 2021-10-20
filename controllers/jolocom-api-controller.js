@@ -1,9 +1,10 @@
+import { response } from "express";
 import {
   makeConnectionRequest,
   connectionResponseServ,
   makeCredentialOffer,
   makeVC,
-  handleJolocomFlow
+  handleJolocomFlow,
 } from "../services/jolocomService";
 
 import { getSealSessionData } from "../services/sealService";
@@ -38,12 +39,12 @@ const handleConnectionResponse = async (req, res, issuerAgent) => {
   const jwtResponse = req.body.token;
   // retrieve the server sessionId from the SesssionManager
   let serverSession = await getSealSessionData(sealSessionId, "issuerSession");
-  
-  const responseToken = await  handleJolocomFlow(req.body.token, issuerAgent)
+
+  const responseToken = await handleJolocomFlow(req.body.token, issuerAgent);
 
   // console.log("handleConnectionResponse")
   // console.log(jwtResponse)
-  
+
   let responseForUserWallet = await connectionResponseServ(
     jwtResponse,
     issuerAgent,
@@ -59,9 +60,16 @@ const handleConnectionResponse = async (req, res, issuerAgent) => {
     })
   );
 
-  // TODO: Make common responce preparation and creation
-  console.log(token.encode())
-  res.json({ token: responseToken.encode() })
+  res.set({
+    "access-control-expose-headers": "WWW-Authenticate,Server-Authorization",
+    "content-type": "text/html; charset=utf-8",
+    "vary": "origin",
+    "strict-transport-security": "max-age=31536000",
+    "cache-control": "no-cache",
+    "content-length": "0",
+    "content-type": "text/html; charset=utf-8",
+  })
+  res.status(200).end()
 };
 
 const handleVCRequestController = async (req, res, issuerAgent, endpoint) => {
@@ -71,13 +79,13 @@ const handleVCRequestController = async (req, res, issuerAgent, endpoint) => {
   let userData = req.session.userData;
   // req.session.endpoint = endpoint;
   // req.session.baseUrl = process.env.BASE_PATH;
-  
+
   let callback = process.env.BASE_PATH
     ? `${endpoint}/${process.env.BASE_PATH}/offerResponse?vcType=${vcType}&seal=${sealSession} `
     : endpoint + `/offerResponse?vcType=${vcType}&seal=${sealSession} `;
   // console.log("handleVCRequestController userData in session")
   // console.log(userData)
-  console.log("handleVCRequestController the callback is " + callback)
+  console.log("handleVCRequestController the callback is " + callback);
   let response = await makeCredentialOffer(
     sealSession,
     vcType,
@@ -95,8 +103,8 @@ const handleVCResponseController = async (req, res, issuerAgent) => {
   let userAttributes = JSON.parse(
     await getSealSessionData(sealSessionId, "user")
   );
-  console.log("handleVCResponseController")
-  console.log(userAttributes)
+  console.log("handleVCResponseController");
+  console.log(userAttributes);
   let userDID = await getSealSessionData(sealSessionId, "DID");
   let userResponseToken = req.body.token;
   let response = await makeVC(

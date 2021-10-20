@@ -181,33 +181,7 @@ const getConfiguredPassport = async (serverEndpoint) => {
     done(null, user);
   });
 
-  router.use(passport.initialize());
-  router.use(passport.session());
-  // Part 2, configure authentication endpoints
-  router.get("/", passport.authenticate("curity")); //listens to /login
-  router.get(
-    "/callback",
-    (req, res, next) => {
-      // console.log(req.session)
-      // console.log("***************")
-      // console.log(req.sessionStore.sessions)
-      // console.log(req.sessionStore.sessions)
-      let key = Object.keys(req.sessionStore.sessions)[0];
-      let oidcSession = JSON.parse(req.sessionStore.sessions[key])[
-        "oidc:vm.project-grids.eu"
-      ];
-      req.session["oidc:vm.project-grids.eu"] = oidcSession;
-      next();
-    },
-    passport.authenticate("curity", { failureRedirect: "/login" }), //listens to /login/callback
-    (req, res) => {
-      console.log("will now redirect to the view");
-      console.log(req.user);
-      res.redirect("/user");
-    }
-  );
-  return passport;
-};
+
 
 // creates a dynamic client for registration
 function getDynClient(redirectURI, jwksURI) {
@@ -294,6 +268,7 @@ async function sendToken(accessToken, endpoint) {
           resJson.verified_claims.verified_claims.forEach((element) => {
             console.log("verified claim found");
             console.log(element);
+            console.log(element.verification.evidence)
           });
           // console.log(resJson.verified_claims.verified_claims)
           console.log("********************************************");
@@ -346,6 +321,37 @@ function getDataFromDPs(_user_info_request, _user_info_port, accessToken) {
     httpsReq.end();
   });
 }
+
+
+router.use(passport.initialize());
+router.use(passport.session());
+// Part 2, configure authentication endpoints
+router.get("/", passport.authenticate("curity")); //listens to /login
+router.get(
+  "/callback",
+  (req, res, next) => {
+    // console.log(req.session)
+    // console.log("***************")
+    // console.log(req.sessionStore.sessions)
+    // console.log(req.sessionStore.sessions)
+    let key = Object.keys(req.sessionStore.sessions)[0];
+    let oidcSession = JSON.parse(req.sessionStore.sessions[key])[
+      "oidc:vm.project-grids.eu"
+    ];
+    req.session["oidc:vm.project-grids.eu"] = oidcSession;
+    next();
+  },
+  passport.authenticate("curity", { failureRedirect: "/login" }), //listens to /login/callback
+  (req, res) => {
+    console.log("will now redirect to the view");
+    console.log(req.user);
+    console.log(req.session.id);
+    res.redirect("/user");
+  }
+);
+return passport;
+};
+
 
 // Part 4, export objects
 exports = module.exports;

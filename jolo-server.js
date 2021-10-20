@@ -17,8 +17,10 @@ import {
   handleVCRequestController,
   handleVCResponseController,
 } from "./controllers/jolocom-api-controller";
-import  {jwksController} from './controllers/jwks-controllers';
+import { jwksController } from "./controllers/jwks-controllers";
 import { subscribe } from "./services/sse-service";
+import winston from "winston";
+import expressWinston from "express-winston";
 
 const KeycloakMultiRealm = require("./config/KeycloakMultiRealm");
 const express = require("express");
@@ -66,6 +68,19 @@ let serverConfiguration = { endpoint: "" };
 
 app.prepare().then(async () => {
   const server = express();
+
+  // // Log the whole request and response body
+  // expressWinston.requestWhitelist.push("body");
+  // expressWinston.responseWhitelist.push("body");
+  server.use(expressWinston.logger({
+    transports: [
+      new winston.transports.Console({
+        json: true,
+        colorize: true
+      })
+    ]
+  }))
+
   server.set("trust proxy", 1); // trust first proxy
   server.use(bodyParser.urlencoded({ extended: true }));
   server.use(bodyParser.json({ type: "*/*" }));
@@ -125,6 +140,16 @@ app.prepare().then(async () => {
     res.send(await updateSession(req, res, serverConfiguration.endpoint));
   });
 
+  // session
+  server.post(["/start-session"], async (req, res) => {
+    console.log("/start-session");
+    await startSession(app, req, res, serverConfiguration.endpoint);
+  });
+  server.post(["/update-session"], async (req, res) => {
+    console.log("/update-session ");
+    res.send(await updateSession(req, res, serverConfiguration.endpoint));
+  });
+
   //jolo
   server.post(["/makeConnectionRequest"], async (req, res) => {
     console.log("/makeConnectionRequest");
@@ -152,13 +177,14 @@ app.prepare().then(async () => {
     handleVCResponseController(req, res, issuerAgent);
   });
 
+ 
   // this call needs to be on the end of the config as, the handle(*,*) must be last
   // otherwise the rest of the controllers are ignored
   configServer(server, https, port, isProduction, handle, serverConfiguration);
-  // grids login flow
+  // grids login flow, all /login*.* uris will be handles by the passportController router
   server.use("/login", passportController);
-  
-  server.use('/jwks', jwksController);
+
+  server.use("/jwks", jwksController);
   server.all("*", async (req, res) => {
     return handle(req, res);
   });
