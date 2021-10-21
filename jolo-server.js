@@ -19,6 +19,8 @@ import {
 } from "./controllers/jolocom-api-controller";
 import  {jwksController} from './controllers/jwks-controllers';
 import { subscribe } from "./services/sse-service";
+import {searchDbController} from "./controllers/seach-db-controllers";
+import mongoose from "mongoose";
 
 const KeycloakMultiRealm = require("./config/KeycloakMultiRealm");
 const express = require("express");
@@ -157,9 +159,24 @@ app.prepare().then(async () => {
   configServer(server, https, port, isProduction, handle, serverConfiguration);
   // grids login flow
   server.use("/login", passportController);
-  
+  server.use("/query", searchDbController);
   server.use('/jwks', jwksController);
   server.all("*", async (req, res) => {
     return handle(req, res);
+  });
+
+  // mongo DB url
+  const mongoDbUrl = "mongodb://localhost:27017/grids";
+
+//connect to the database
+  mongoose.connect(mongoDbUrl,
+      {
+        useNewUrlParser: true
+      }
+  );
+  const db = mongoose.connection;
+  db.on('error', console.error.bind(console, 'connection error:'));
+  db.once('open', function () {
+    console.log('Connected to the database');
   });
 });
