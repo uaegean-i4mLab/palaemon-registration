@@ -5,11 +5,14 @@ import {
   issueEidas,
   handleIssueEidasResponse,
   issueMyID,
+  kybWizard,
+  companySelection,
 } from "./controllers/views-controllers";
 import {
   startSession,
   makeEidasRedirectionToken,
   updateSession,
+  
 } from "./controllers/seal-api-controllers";
 import {
   makeConnectionRequestController,
@@ -72,14 +75,14 @@ app.prepare().then(async () => {
   // // Log the whole request and response body
   // expressWinston.requestWhitelist.push("body");
   // expressWinston.responseWhitelist.push("body");
-  server.use(expressWinston.logger({
-    transports: [
-      new winston.transports.Console({
-        json: true,
-        colorize: true
-      })
-    ]
-  }))
+  // server.use(expressWinston.logger({
+  //   transports: [
+  //     new winston.transports.Console({
+  //       json: true,
+  //       colorize: true
+  //     })
+  //   ]
+  // }))
 
   server.set("trust proxy", 1); // trust first proxy
   server.use(bodyParser.urlencoded({ extended: true }));
@@ -96,6 +99,26 @@ app.prepare().then(async () => {
   server.get("/events", subscribe);
 
   //view
+  server.get(["/kyb/wizard"], async (req, res) => {
+    console.log("/kyb/wizard");
+    return kybWizard(app, req, res, serverConfiguration.endpoint);
+  });
+  server.get(["/company-selection"], async (req, res) => {
+    console.log("/company-selection");
+    return companySelection(app, req, res, serverConfiguration.endpoint);
+  });
+
+  server.post(["/start-login"], async (req,res)=>{
+    console.log("/start-login");
+    let lei = req.body.lei
+    let companyName = req.body.companyName
+    let company = req.body.company
+    console.log(`${lei}-${company}-${companyName}`)
+    res.redirect(307, '/login');
+  })
+
+
+
   server.get(["/vc/issue/eidas"], async (req, res) => {
     console.log("/vc/issue/eidas");
     return issueEidas(app, req, res, serverConfiguration.endpoint);

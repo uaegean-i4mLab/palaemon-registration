@@ -1,5 +1,5 @@
 // Part 0 GRIDS specific
-let claims = {
+let defaultClaims = {
   userinfo: {
     verified_claims: {
       verification: {
@@ -113,7 +113,7 @@ keyStore
   });
 
 // Part 4, configuration of Passport
-const getConfiguredPassport = async (serverEndpoint) => {
+const getConfiguredPassport = async (serverEndpoint, claims = defaultClaim) => {
   let _issuer_url = process.env.ISSUER_URL
     ? process.env.ISSUER_URL
     : "https://vm.project-grids.eu:8180/auth/realms/grids";
@@ -202,7 +202,7 @@ function getDynClient(redirectURI, jwksURI) {
     path: "/auth/realms/grids/clients-registrations/openid-connect",
     method: "POST",
     headers: {
-      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NDdiMzRmNy02YmZjLTRhODgtODgxYS0wYjlhNWQ3NjZmOTgifQ.eyJleHAiOjAsImlhdCI6MTYzMzY4MTM4MCwianRpIjoiY2QxZmE0ZjItMTUzYS00NjQyLWE1ZWQtMWExMWRiNjcwM2MwIiwiaXNzIjoiaHR0cHM6Ly92bS5wcm9qZWN0LWdyaWRzLmV1OjgxODAvYXV0aC9yZWFsbXMvZ3JpZHMiLCJhdWQiOiJodHRwczovL3ZtLnByb2plY3QtZ3JpZHMuZXU6ODE4MC9hdXRoL3JlYWxtcy9ncmlkcyIsInR5cCI6IkluaXRpYWxBY2Nlc3NUb2tlbiJ9.w4zYKqdMJggijHJTpMGuVBh1T1FzODCUdEH9XI0YhQs`,
+      Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCIgOiAiSldUIiwia2lkIiA6ICI3NDdiMzRmNy02YmZjLTRhODgtODgxYS0wYjlhNWQ3NjZmOTgifQ.eyJleHAiOjAsImlhdCI6MTYzNDgxNzI1MiwianRpIjoiYzNiNjZiNjEtOTg5Yy00ZmY5LWJlNGQtNTdmZmJiMDIxODM1IiwiaXNzIjoiaHR0cHM6Ly92bS5wcm9qZWN0LWdyaWRzLmV1OjgxODAvYXV0aC9yZWFsbXMvZ3JpZHMiLCJhdWQiOiJodHRwczovL3ZtLnByb2plY3QtZ3JpZHMuZXU6ODE4MC9hdXRoL3JlYWxtcy9ncmlkcyIsInR5cCI6IkluaXRpYWxBY2Nlc3NUb2tlbiJ9.-0XGFJobxqzvtLeJby9geLLOptj8ofFUwJQpknEqpyY`,
       "Content-Type": "application/json",
       "Content-Length": data.length,
     },
@@ -327,6 +327,7 @@ router.use(passport.initialize());
 router.use(passport.session());
 // Part 2, configure authentication endpoints
 router.get("/", passport.authenticate("curity")); //listens to /login
+router.post("/", passport.authenticate("curity")); //listens to /login
 router.get(
   "/callback",
   (req, res, next) => {

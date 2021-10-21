@@ -24,12 +24,17 @@
       "static/chunks/webpack.js",
       "static/chunks/pages/_error.js"
     ],
-    "/vc/issue/eidas": [
+    "/kyb/company-selection": [
       "static/chunks/main.js",
       "static/chunks/webpack.js",
       "static/css/styles.chunk.css",
       "static/chunks/styles.js",
-      "static/chunks/pages/vc/issue/eidas.js"
+      "static/chunks/pages/kyb/company-selection.js"
+    ],
+    "/next/dist/pages/_error": [
+      "static/chunks/main.js",
+      "static/chunks/webpack.js",
+      "static/chunks/pages/next/dist/pages/_error.js"
     ]
   },
   "ampFirstPages": []

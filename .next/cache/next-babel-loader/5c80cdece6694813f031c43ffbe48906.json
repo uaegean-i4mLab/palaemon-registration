@@ -1,0 +1,1 @@
+{"ast":null,"code":"var vcTypes = function vcTypes() {\n  return {\n    eidas: \"UAegean_myeIDAS_ID\",\n    edugain: \"UAegean_myeduGAIN_ID\",\n    disposble: \"UAegean_Disposable_ID\",\n    aegean: \"UAegean_myID_Card\"\n  };\n};\n\nexports.vcTypes = vcTypes();","map":null,"metadata":{},"sourceType":"script"}
