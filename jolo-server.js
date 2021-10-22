@@ -1,5 +1,5 @@
 import { getSessionConfg, getCacheStore } from "./config/sessionConf";
-import { configServer } from "./config/serverConfig";
+import { configServer,} from "./config/serverConfig";
 import { initAgent } from "./config/jolocomAgent";
 import {
   issueEidas,
@@ -7,12 +7,13 @@ import {
   issueMyID,
   kybWizard,
   companySelection,
+  startLogin,
+  validateRelationship,
 } from "./controllers/views-controllers";
 import {
   startSession,
   makeEidasRedirectionToken,
   updateSession,
-  
 } from "./controllers/seal-api-controllers";
 import {
   makeConnectionRequestController,
@@ -22,8 +23,9 @@ import {
 } from "./controllers/jolocom-api-controller";
 import { jwksController } from "./controllers/jwks-controllers";
 import { subscribe } from "./services/sse-service";
-import winston from "winston";
-import expressWinston from "express-winston";
+
+// import winston from "winston";
+// import expressWinston from "express-winston";
 
 const KeycloakMultiRealm = require("./config/KeycloakMultiRealm");
 const express = require("express");
@@ -40,8 +42,8 @@ const axios = require("axios");
 const moment = require("moment");
 const app = next({ dev });
 const handle = app.getRequestHandler();
+const cookieParser = require('cookie-parser');
 const {
-  getConfiguredPassport,
   passportController,
 } = require("./controllers/security/passport");
 
@@ -83,11 +85,13 @@ app.prepare().then(async () => {
   //     })
   //   ]
   // }))
-
   server.set("trust proxy", 1); // trust first proxy
   server.use(bodyParser.urlencoded({ extended: true }));
   server.use(bodyParser.json({ type: "*/*" }));
   server.use(session(SESSION_CONF));
+  server.use(cookieParser())
+
+
   // server.use(keycloak.middleware());
 
   // initiate the jolocom agent
@@ -99,25 +103,21 @@ app.prepare().then(async () => {
   server.get("/events", subscribe);
 
   //view
-  server.get(["/kyb/wizard"], async (req, res) => {
-    console.log("/kyb/wizard");
-    return kybWizard(app, req, res, serverConfiguration.endpoint);
-  });
+
   server.get(["/company-selection"], async (req, res) => {
     console.log("/company-selection");
     return companySelection(app, req, res, serverConfiguration.endpoint);
   });
 
-  server.post(["/start-login"], async (req,res)=>{
+  server.post(["/start-login"], async (req, res) => {
     console.log("/start-login");
-    let lei = req.body.lei
-    let companyName = req.body.companyName
-    let company = req.body.company
-    console.log(`${lei}-${company}-${companyName}`)
-    res.redirect(307, '/login');
-  })
+    startLogin(app, req, res, serverPassport, oidcClient);
+  });
 
-
+  server.get(["/validate-relation"], async (req, res) => {
+    console.log("/validate-relation");
+    return validateRelationship(app, req, res, serverConfiguration.endpoint);
+  });
 
   server.get(["/vc/issue/eidas"], async (req, res) => {
     console.log("/vc/issue/eidas");
@@ -200,10 +200,18 @@ app.prepare().then(async () => {
     handleVCResponseController(req, res, issuerAgent);
   });
 
- 
   // this call needs to be on the end of the config as, the handle(*,*) must be last
   // otherwise the rest of the controllers are ignored
-  configServer(server, https, port, isProduction, handle, serverConfiguration);
+  let { endpoint, passport, client } = await configServer(
+    server,
+    https,
+    port,
+    isProduction,
+    handle,
+    serverConfiguration
+  );
+  let serverPassport = passport;
+  let oidcClient = client;
   // grids login flow, all /login*.* uris will be handles by the passportController router
   server.use("/login", passportController);
 

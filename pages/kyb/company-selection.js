@@ -35,7 +35,7 @@ class QueryView extends React.Component {
       [name]: value,
     });
     if (
-      this.stringNotEmpty(this.state.LEI) ||
+      this.stringNotEmpty(this.state.lei) ||
       (this.stringNotEmpty(this.state.companyCountry) &&
         this.stringNotEmpty(this.state.companyName))
     ) {
@@ -86,7 +86,7 @@ class QueryView extends React.Component {
           </label>
           <label className="row">
             LEI:
-            <input type="text" name="LEI" onChange={this.handleChange} />
+            <input type="text" name="lei" onChange={this.handleChange} />
           </label>
           <div className="row">
             <input type="submit" disabled={!this.state.isNextEnabled} />

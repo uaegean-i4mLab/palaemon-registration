@@ -1,6 +1,10 @@
 import { getSealSessionData, validateToken } from "../services/sealService";
 import { endpoints } from "../config/seal_endpoints";
 import { parseSealAttributeSet } from "../utils/dataStoreHelper";
+import { defaultClaims } from "../config/defaultOidcClaims";
+import { updatePassportConfig } from "../config/serverConfig";
+import { v4 as uuidv4 } from "uuid";
+import { getSessionData, setOrUpdateSessionData } from "../services/redis";
 
 const kybWizard = async (app, req, res, endpoint) => {
   req.userDetails = {
@@ -21,8 +25,67 @@ const kybWizard = async (app, req, res, endpoint) => {
   return app.render(req, res, "/kyb/wizard", req.query);
 };
 
-const companySelection = async (app, req, res, endpoint) => {
+const companySelection = async (app, req, res) => {
+  let sessionId = uuidv4();
+  // console.log(`created the following session ${sessionId}`);
+  // read cookies
+  // console.log(req.cookies);
+
+  let options = {
+    maxAge: 1000 * 60 * 15, // would expire after 15 minutes
+    httpOnly: true, // The cookie only accessible by the web server
+    signed: false, // Indicates if the cookie should be signed
+  };
+
+  // Set cookie
+  res.cookie("sessionId", sessionId, options); // options is optional
   return app.render(req, res, "/kyb/company-selection", req.query);
+};
+
+const startLogin = async (app, req, res, serverPassport, oidcClient) => {
+  let lei = req.body.lei;
+  let companyName = req.body.companyName;
+  let companyCountry = req.body.companyCountry;
+  // console.log(`${lei}-${companyCountry}-${companyName}`)
+  // console.log("the passport!!!")
+  // console.log(passport);
+  let claims = defaultClaims;
+  // if(lei)
+  // claims.userinfo.verified_claims.claims.lei= lei
+  if (companyName)
+    claims.userinfo.verified_claims.claims.legal_name = companyName;
+  let sessionId = req.cookies.sessionId;
+  setOrUpdateSessionData(sessionId,"selfLEI", lei);
+  updatePassportConfig(serverPassport, claims, oidcClient);
+  res.redirect(307, "/login");
+};
+
+const validateRelationship = async (app, req, res, endpoint) => {
+  let sessionId = req.cookies.sessionId;
+  let userDetails = await getSessionData(sessionId, "userDetails");
+  let selfLei = await getSessionData(sessionId, "selfLEI");
+  // console.log(`sessionId ${sessionId} details:`)
+  req.userDetails = userDetails;
+  req.selfLei = selfLei
+  // console.log(userDetails)
+  /*
+  {
+  lei: '529900ENKWV3BZ5GYL12',
+  address: null,
+  birthdate: '1965-01-01',
+  business_role: null,
+  trading_status: 'LIVE',
+  legal_name: '360kompany AG',
+  sub_jurisdiction: 'AT',
+  sic: '["7375 - Informationsabruf von entfernten Datenbanken","1450 - Media","73759903 - Remote data base information retrieval","63120 - Web portals"]',
+  given_name: 'claude',
+  vat_registration: 'ATU67091005',
+  legal_person_identifier: '375714x',
+  family_name: 'Phil',
+  personal_number: 'el/el/11111'
+}
+  */
+  return app.render(req, res, "/kyb/validate-relation", req.query);
 };
 
 const issueEidas = async (app, req, res, endpoint) => {
@@ -122,4 +185,6 @@ export {
   issueMyID,
   kybWizard,
   companySelection,
+  startLogin,
+  validateRelationship,
 };

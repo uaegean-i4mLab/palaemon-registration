@@ -223,13 +223,15 @@ const makeVC = async (
     "mySecretPassword"
   );
   const userIssuerInteraction = await issuerAgent.processJWT(responseToken);
-  return {
+  let credentialOffer = {
     token: (
       await userIssuerInteraction.createCredentialReceiveToken([
         offeredCredential,
       ])
     ).encode(),
   };
+  console.log(credentialOffer)
+  return  credentialOffer
 };
 
 export {

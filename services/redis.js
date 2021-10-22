@@ -18,16 +18,16 @@ const setOrUpdateSessionData = async (
 ) => {
   let client = getClient();
   let cacheObject = {
-    variablName: variableValue,
+    [variableName]: variableValue,
   };
-//   console.log("object to cache");
-//   console.log(cacheObject);
+  console.log("object to cache");
+  console.log(cacheObject);
   //frist make sure object doesnot exist
   //if it exists get it and update if necessary its keys
-  let existingObject = client.get(sessionId);
-//   console.log("existing object");
-//   console.log(existingObject);
-  if (existingObject !== false) {
+  let existingObject = JSON.parse(await getSessionData(sessionId));
+  console.log("existing object");
+  console.log(existingObject);
+  if (existingObject) {
     existingObject[variableName] = variableValue;
     client.setex(sessionId, DEFAULT_EXPIRATION, JSON.stringify(existingObject));
   } else {
