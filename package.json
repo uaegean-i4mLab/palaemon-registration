@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "ENDPOINT='http://localhost:5000'  node -r esm jolo-server.js",
+    "dev": "node -r esm jolo-server.js",
     "build": "next build",
     "start": "node -r esm server.js",
     "test": "mocha --require esm"
