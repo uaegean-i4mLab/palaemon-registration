@@ -37,8 +37,11 @@ const companySelection = async (app, req, res) => {
     signed: false, // Indicates if the cookie should be signed
   };
 
+  let externalSessionId = req.query.extSessionId ? req.query.extSessionId : "";
+  console.log(`hey the external session id is:${req.query.extSessionId}`);
   // Set cookie
   res.cookie("sessionId", sessionId, options); // options is optional
+  res.cookie("extSessionId", externalSessionId, options);
   return app.render(req, res, "/kyb/company-selection", req.query);
 };
 
@@ -46,17 +49,49 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
   let lei = req.body.lei;
   let companyName = req.body.companyName;
   let companyCountry = req.body.companyCountry;
+  let legalPersonIdentifier = req.body.legal_person_identifier;
   // console.log(`${lei}-${companyCountry}-${companyName}`)
   // console.log("the passport!!!")
   // console.log(passport);
   let claims = defaultClaims;
   // if(lei)
   // claims.userinfo.verified_claims.claims.lei= lei
-  if (companyName)
-    claims.userinfo.verified_claims.claims.legal_name = companyName;
   let sessionId = req.cookies.sessionId;
-  setOrUpdateSessionData(sessionId,"selfLEI", lei);
-  updatePassportConfig(serverPassport, claims, oidcClient);
+  await setOrUpdateSessionData(sessionId, "selfLEI", lei);
+  await setOrUpdateSessionData(sessionId, "companyName", companyName);
+  await setOrUpdateSessionData(sessionId, "companyCountry", companyCountry);
+
+  if (companyName && legalPersonIdentifier) {
+    const headerRaw = {
+      alg: "none",
+      typ: "JWT",
+    };
+    const payloadRaw = {
+      sub: "mock",
+      aud: "mock",
+      iss: "http://localhost",
+      client_id: oidcClient.client_id,
+      redirect_uri: oidcClient.redirect_uris[0],
+      claims: claims,
+      legal_name: companyName,
+      legal_person_identifier: legalPersonIdentifier,
+      // legal_person_identifier: "123",
+    };
+
+    // console.log(oidcClient)
+    // console.log(oidcClient.client_id)
+    // console.log(oidcClient.redirect_uris)
+
+    const header = JSON.stringify(headerRaw);
+    const payload = JSON.stringify(payloadRaw);
+    let  jwt = `${urlEncode(header)}.${urlEncode(payload)}.`
+    console.log(`viewcontrollers.js::startLogin:: will make request with jwt`)
+    updatePassportConfig(serverPassport, claims, oidcClient, jwt);
+  }else{
+    updatePassportConfig(serverPassport, claims, oidcClient);
+  }
+
+  // updatePassportConfig(serverPassport, claims, oidcClient);
   res.redirect(307, "/login");
 };
 
@@ -66,7 +101,7 @@ const validateRelationship = async (app, req, res, endpoint) => {
   let selfLei = await getSessionData(sessionId, "selfLEI");
   // console.log(`sessionId ${sessionId} details:`)
   req.userDetails = userDetails;
-  req.selfLei = selfLei
+  req.selfLei = selfLei;
   // console.log(userDetails)
   /*
   {
@@ -86,6 +121,16 @@ const validateRelationship = async (app, req, res, endpoint) => {
 }
   */
   return app.render(req, res, "/kyb/validate-relation", req.query);
+};
+
+const registryPrompt = async (app, req, res, endpoint) => {
+  let sessionId = req.cookies.sessionId;
+  let userDetails = await getSessionData(sessionId, "userDetails");
+  let selfLei = await getSessionData(sessionId, "selfLEI");
+  // console.log(`sessionId ${sessionId} details:`)
+  req.userDetails = userDetails;
+  req.selfLei = selfLei;
+  return app.render(req, res, "/kyb/registry-prompt", req.query);
 };
 
 const issueEidas = async (app, req, res, endpoint) => {
@@ -179,6 +224,16 @@ const issueMyID = async (app, req, res, endpoint) => {
   return app.render(req, res, "/vc/issue/myID", req.query);
 };
 
+
+const encode = function (unencoded) {
+  return new Buffer(unencoded || "").toString("base64");
+};
+const urlEncode = function (unencoded) {
+  const encoded = encode(unencoded);
+  return encoded.replace(/\+/g, "-").replace(/\//, "_").replace(/=+$/, "");
+};
+
+
 export {
   issueEidas,
   handleIssueEidasResponse,
@@ -187,4 +242,5 @@ export {
   companySelection,
   startLogin,
   validateRelationship,
+  registryPrompt,
 };

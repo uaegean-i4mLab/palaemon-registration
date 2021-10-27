@@ -2,11 +2,12 @@ import React from "react";
 import axios from "axios";
 import Layout from "../../components/Layout";
 import { connect } from "react-redux";
-import ValidateTable from "../../components/ValidateKYBComp";
+import { useHistory } from "react-router-dom";
 
 class Wizard extends React.Component {
   constructor(props) {
     super(props);
+    this.signAndProceed = this.signAndProceed.bind(this);
   }
 
   static async getInitialProps({ reduxStore, req }) {
@@ -16,6 +17,11 @@ class Wizard extends React.Component {
       userDetails: req.userDetails,
       selfLei: req.selfLei,
     };
+  }
+
+  signAndProceed = ()=> {
+    window.location.href = "/kyb/registry-prompt"
+    // history.push("/kyb/registry-prompt");
   }
 
   render() {
@@ -33,19 +39,27 @@ class Wizard extends React.Component {
           Document:
         </div>
         <div className="row" style={{ marginBottom: "3rem" }}>
-          I 
+          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>I</span>
           <b>
             {this.props.userDetails.given_name}{" "}
             {this.props.userDetails.family_name}
           </b>
-          , born at: <b>{this.props.userDetails.birthdate}</b>
-          identified by the eIDAS personal Identifier:{" "}
+          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>, born at:</span>{" "}
+          <b>{this.props.userDetails.birthdate}</b>
+          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>
+            identified by the eIDAS personal Identifier:
+          </span>
           <b>{this.props.userDetails.personal_number}</b>
-          attest that I am affiliated the company identified by the LEI or Legal Name: <b>{this.props.selfLei}</b>.
+          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>
+            {" "}
+            attest that I am affiliated with the company identified by the LEI
+            or Legal Name:
+          </span>
+          <b>{this.props.selfLei}</b>.
         </div>
 
         <div className="row" style={{ marginBottom: "3rem" }}>
-          <button>Sign</button>
+          <button onClick={this.signAndProceed}>Sign</button>
         </div>
       </div>
     );

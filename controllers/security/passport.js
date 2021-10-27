@@ -268,20 +268,41 @@ async function sendToken(accessToken, endpoint) {
   });
 }
 
+/*
+ claims,
+    passport,
+    _user_info_request,
+    _user_info_port,
+    client,
+    jwt
+*/
+
 const addClaimsToStrategy = (
   claims,
   passport,
   _user_info_request,
   _user_info_port,
-  client
+  client,
+  jwt = null
 ) => {
+  let finalParams = {};
+  if (jwt) {
+    console.log(`passport.js: ${jwt}`);
+    finalParams = {
+      scope: "openid profile",
+      request: jwt,
+    };
+  } else {
+    finalParams = {
+      scope: "openid profile",
+      claims: claims,
+    };
+  }
+
   const strategy = new Strategy(
     {
       client,
-      params: {
-        scope: "openid profile",
-        claims: claims,
-      },
+      params: finalParams,
       fallbackToUserInfoRequest: true,
     },
 

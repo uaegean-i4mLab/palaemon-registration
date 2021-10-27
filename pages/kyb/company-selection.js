@@ -14,7 +14,6 @@ class QueryView extends React.Component {
       isNextEnabled: false,
     };
     this.handleChange = this.handleChange.bind(this);
-    this.handleSubmit = this.handleSubmit.bind(this)
     this.stringNotEmpty = this.stringNotEmpty.bind(this);
   }
 
@@ -29,15 +28,16 @@ class QueryView extends React.Component {
   async handleChange(event) {
     const name = event.target.name;
     const value = event.target.value;
-    console.log(name + " " + value);
+    // console.log(name + " " + value);
     // setInputs(values => ({...values, [name]: value}))
     await this.setState({
       [name]: value,
     });
     if (
-      this.stringNotEmpty(this.state.lei) ||
-      (this.stringNotEmpty(this.state.companyCountry) &&
-        this.stringNotEmpty(this.state.companyName))
+      this.stringNotEmpty(this.state.email) &&
+      (this.stringNotEmpty(this.state.lei) ||
+        (this.stringNotEmpty(this.state.legal_person_identifier) &&
+          this.stringNotEmpty(this.state.companyName)))
     ) {
       this.setState({
         isNextEnabled: true,
@@ -48,11 +48,6 @@ class QueryView extends React.Component {
       });
     }
   }
-
-  handleSubmit = async (event) => {
-    event.preventDefault();
-    console.log(`clicked submit`);
-  };
 
   stringNotEmpty(s) {
     if (s) {
@@ -77,10 +72,10 @@ class QueryView extends React.Component {
             />
           </label>
           <label className="row">
-            Company Country:
+            Legal Person Identifier:
             <input
               type="text"
-              name="companyCountry"
+              name="legal_person_identifier"
               onChange={this.handleChange}
             />
           </label>
@@ -88,9 +83,14 @@ class QueryView extends React.Component {
             LEI:
             <input type="text" name="lei" onChange={this.handleChange} />
           </label>
+
+          <label className="row">
+            e-mail:
+            <input type="text" name="email" onChange={this.handleChange} />
+          </label>
+
           <div className="row">
             <input type="submit" disabled={!this.state.isNextEnabled} />
-            
           </div>
         </form>
       </div>

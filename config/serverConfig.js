@@ -2,7 +2,7 @@ const ngrok = require("ngrok");
 const {
   getConfiguredPassport,
   addClaimsToStrategy,
-} = require("../controllers/security/passport");
+} = require ("../controllers/security/passport");
 
 const configServer = (
   server,
@@ -47,7 +47,8 @@ const configServer = (
             `running in production is ${isProduction} and port is ${port}`
           );
           serverConfiguration.endpoint = process.env.ENDPOINT;
-          const passport = await getConfiguredPassport(isProduction,
+          const passport = await getConfiguredPassport(
+            isProduction,
             serverConfiguration.endpoint
           );
         } else {
@@ -56,12 +57,15 @@ const configServer = (
             serverConfiguration.endpoint = ngrokUrl;
             console.log(`running, open at ${serverConfiguration.endpoint}`);
             console.log(`configuring the passport`);
-            let {passport,client} = await getConfiguredPassport(isProduction,ngrokUrl);
+            let { passport, client } = await getConfiguredPassport(
+              isProduction,
+              ngrokUrl
+            );
 
             resolve({
               endpoint: serverConfiguration.endpoint,
               passport: passport,
-              client:client
+              client: client,
             });
           });
         }
@@ -70,19 +74,21 @@ const configServer = (
   });
 };
 
-const updatePassportConfig = (passport, claims, client) => {
+const updatePassportConfig = (passport, claims, client, jwt = null) => {
   let _user_info_request = process.env.USER_INFO
     ? process.env.USER_INFO
     : "vm.project-grids.eu";
   let _user_info_port = process.env.USER_INFO_PORT
     ? process.env.USER_INFO_PORT
     : "8180";
+  console.log(`serverConfig.js::updatePassportConfig:: jtw: ${jwt}`);
   addClaimsToStrategy(
     claims,
     passport,
     _user_info_request,
     _user_info_port,
-    client
+    client,
+    jwt
   );
 };
 
