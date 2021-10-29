@@ -7,6 +7,11 @@ import ValidateTable from "../../components/ValidateKYBComp";
 class Wizard extends React.Component {
   constructor(props) {
     super(props);
+    this.addUserToRegistry = this.addUserToRegistry.bind(this);
+    this.proceedToKeycloak = this.proceedToKeycloak.bind(this);
+    this.state = {
+      addedToRegistry: false,
+    };
   }
 
   static async getInitialProps({ reduxStore, req }) {
@@ -15,10 +20,38 @@ class Wizard extends React.Component {
     return {
       userDetails: req.userDetails,
       selfLei: req.selfLei,
+      sessionId: req.sessionId,
+      keycloakUrl: req.keycloakRedirectURI
     };
   }
 
+  addUserToRegistry() {
+    let sessionId = this.props.sessionId;
+    const reqObj = { sessionId: sessionId };
+    axios.post("/registry/add", reqObj).then((response) => {
+      console.log(response);
+      this.setState({
+        addedToRegistry: true,
+      });
+    });
+    //TODO add here the send email callback
+  
+  }
+
+  proceedToKeycloak(){
+    console.log("proceed to keycloak")
+    window.location.href = this.props.keycloakUrl
+  }
+
   render() {
+    let addToRegistryDiv = !this.state.addedToRegistry ? (
+      <div className="row" style={{ marginBottom: "3 rem"}}>
+        <button onClick={this.addUserToRegistry}>Register</button>
+      </div>
+    ) : (
+      <div style={{ margin: "3 rem 3 rem 3 rem 3 rem"}}>Thank you for registering</div>
+    );
+
     return (
       <div className="container" style={{ marginTop: "3rem" }}>
         {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
@@ -38,12 +71,10 @@ class Wizard extends React.Component {
           <ValidateTable userDetails={this.props.userDetails}></ValidateTable>
         </div>
 
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          <button>Register</button>
-        </div>
+        {addToRegistryDiv}
 
         <div className="row" style={{ marginBottom: "3rem" }}>
-          <button>Finish</button>
+          <button onClick={this.proceedToKeycloak}>Finish</button>
         </div>
       </div>
     );

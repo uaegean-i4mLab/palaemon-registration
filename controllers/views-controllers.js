@@ -84,10 +84,10 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
 
     const header = JSON.stringify(headerRaw);
     const payload = JSON.stringify(payloadRaw);
-    let  jwt = `${urlEncode(header)}.${urlEncode(payload)}.`
-    console.log(`viewcontrollers.js::startLogin:: will make request with jwt`)
+    let jwt = `${urlEncode(header)}.${urlEncode(payload)}.`;
+    console.log(`viewcontrollers.js::startLogin:: will make request with jwt`);
     updatePassportConfig(serverPassport, claims, oidcClient, jwt);
-  }else{
+  } else {
     updatePassportConfig(serverPassport, claims, oidcClient);
   }
 
@@ -102,6 +102,7 @@ const validateRelationship = async (app, req, res, endpoint) => {
   // console.log(`sessionId ${sessionId} details:`)
   req.userDetails = userDetails;
   req.selfLei = selfLei;
+  req.sessionId = sessionId;
   // console.log(userDetails)
   /*
   {
@@ -130,6 +131,11 @@ const registryPrompt = async (app, req, res, endpoint) => {
   // console.log(`sessionId ${sessionId} details:`)
   req.userDetails = userDetails;
   req.selfLei = selfLei;
+  req.sessionId = sessionId;
+  // req.extSessionId = req.cookies.extSessionId;
+  req.keycloakRedirectURI = process.env.KEYCLOAK_REDIRECT_URI
+    ? `${process.env.KEYCLOAK_REDIRECT_URI}?extSessionId=${req.cookies.extSessionId}`
+    : `http://localhost:8081/auth/realms/test/kybResponse?extSessionId=${req.cookies.extSessionId}`;
   return app.render(req, res, "/kyb/registry-prompt", req.query);
 };
 
@@ -224,7 +230,6 @@ const issueMyID = async (app, req, res, endpoint) => {
   return app.render(req, res, "/vc/issue/myID", req.query);
 };
 
-
 const encode = function (unencoded) {
   return new Buffer(unencoded || "").toString("base64");
 };
@@ -232,7 +237,6 @@ const urlEncode = function (unencoded) {
   const encoded = encode(unencoded);
   return encoded.replace(/\+/g, "-").replace(/\//, "_").replace(/=+$/, "");
 };
-
 
 export {
   issueEidas,

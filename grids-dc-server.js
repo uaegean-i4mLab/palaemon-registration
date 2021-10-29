@@ -23,6 +23,7 @@ import {
   handleVCResponseController,
 } from "./controllers/jolocom-api-controller";
 import { jwksController } from "./controllers/jwks-controllers";
+import { addToRegistry } from "./controllers/registryControllers";
 import { subscribe } from "./services/sse-service";
 
 // import winston from "winston";
@@ -150,6 +151,13 @@ app.prepare().then(async () => {
       serverConfiguration.endpoint
     );
   });
+
+  // registry
+  server.post(["/registry/add"], async (req, res) => {
+    console.log("/registry/add");  
+    await addToRegistry(req,res);
+  });
+
 
   //seal
   server.post(["/seal/start-session"], async (req, res) => {
