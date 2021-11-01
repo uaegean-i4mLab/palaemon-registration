@@ -35,9 +35,8 @@ class QueryView extends React.Component {
     });
     if (
       this.stringNotEmpty(this.state.email) &&
-      (this.stringNotEmpty(this.state.lei) ||
-        (this.stringNotEmpty(this.state.legal_person_identifier) &&
-          this.stringNotEmpty(this.state.companyName)))
+      (this.stringNotEmpty(this.state.companyName) ||
+        this.stringNotEmpty(this.state.legal_person_identifier))
     ) {
       this.setState({
         isNextEnabled: true,
@@ -62,7 +61,22 @@ class QueryView extends React.Component {
   render() {
     return (
       <div className="container">
+        <div
+          className="row"
+          style={{ marginBottom: "3rem", marginTop: "3rem" }}
+        >
+          In order to build the KYB profile of your Company, please provide your
+          name and company’s details below, and then click the “Submit” button.
+        </div>
+
         <form action="/start-login" method="post">
+          <div
+            className="row"
+            style={{ marginBottom: "2rem", marginTop: "1rem" }}
+          >
+            {" "}
+            <b>Company Details:</b>
+          </div>
           <label className="row">
             Company Name:
             <input
@@ -72,18 +86,30 @@ class QueryView extends React.Component {
             />
           </label>
           <label className="row">
-            Legal Person Identifier:
+            Company identifier:
             <input
               type="text"
               name="legal_person_identifier"
               onChange={this.handleChange}
             />
           </label>
-          <label className="row">
-            LEI:
-            <input type="text" name="lei" onChange={this.handleChange} />
-          </label>
 
+          <div
+            className="row"
+            style={{ marginBottom: "2rem", marginTop: "2rem" }}
+          >
+            {" "}
+            <b>Representative Details:</b>
+          </div>
+
+          <label className="row">
+            Name:
+            <input type="text" name="name" onChange={this.handleChange} />
+          </label>
+          <label className="row">
+            Surname:
+            <input type="text" name="surname" onChange={this.handleChange} />
+          </label>
           <label className="row">
             e-mail:
             <input type="text" name="email" onChange={this.handleChange} />

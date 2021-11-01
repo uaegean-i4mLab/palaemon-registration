@@ -24,12 +24,19 @@
       "static/chunks/webpack.js",
       "static/chunks/pages/_error.js"
     ],
-    "/kyb/company-selection": [
+    "/kyb/registry-prompt": [
       "static/chunks/main.js",
       "static/chunks/webpack.js",
       "static/css/styles.chunk.css",
       "static/chunks/styles.js",
-      "static/chunks/pages/kyb/company-selection.js"
+      "static/chunks/pages/kyb/registry-prompt.js"
+    ],
+    "/kyb/validate-relation": [
+      "static/chunks/main.js",
+      "static/chunks/webpack.js",
+      "static/css/styles.chunk.css",
+      "static/chunks/styles.js",
+      "static/chunks/pages/kyb/validate-relation.js"
     ]
   },
   "ampFirstPages": []

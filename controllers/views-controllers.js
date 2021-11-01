@@ -46,22 +46,17 @@ const companySelection = async (app, req, res) => {
 };
 
 const startLogin = async (app, req, res, serverPassport, oidcClient) => {
-  let lei = req.body.lei;
+  // let lei = req.body.lei;
   let companyName = req.body.companyName;
-  let companyCountry = req.body.companyCountry;
   let legalPersonIdentifier = req.body.legal_person_identifier;
-  // console.log(`${lei}-${companyCountry}-${companyName}`)
-  // console.log("the passport!!!")
-  // console.log(passport);
+  
   let claims = defaultClaims;
-  // if(lei)
-  // claims.userinfo.verified_claims.claims.lei= lei
   let sessionId = req.cookies.sessionId;
-  await setOrUpdateSessionData(sessionId, "selfLEI", lei);
+  await setOrUpdateSessionData(sessionId, "legalPersonIdentifier", legalPersonIdentifier);
   await setOrUpdateSessionData(sessionId, "companyName", companyName);
-  await setOrUpdateSessionData(sessionId, "companyCountry", companyCountry);
+  // await setOrUpdateSessionData(sessionId, "companyCountry", companyCountry);
 
-  if (companyName && legalPersonIdentifier) {
+  if (companyName || legalPersonIdentifier) {
     const headerRaw = {
       alg: "none",
       typ: "JWT",
@@ -73,10 +68,14 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
       client_id: oidcClient.client_id,
       redirect_uri: oidcClient.redirect_uris[0],
       claims: claims,
-      legal_name: companyName,
-      legal_person_identifier: legalPersonIdentifier,
-      // legal_person_identifier: "123",
     };
+
+    if (companyName) {
+      payloadRaw.legal_name = companyName;
+    }
+    if (legalPersonIdentifier) {
+      payloadRaw.legal_person_identifier = legalPersonIdentifier;
+    }
 
     // console.log(oidcClient)
     // console.log(oidcClient.client_id)
@@ -98,10 +97,12 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
 const validateRelationship = async (app, req, res, endpoint) => {
   let sessionId = req.cookies.sessionId;
   let userDetails = await getSessionData(sessionId, "userDetails");
-  let selfLei = await getSessionData(sessionId, "selfLEI");
+  let legalPersonIdentifier = await getSessionData(sessionId, "legalPersonIdentifier");
+  let companyName = await getSessionData(sessionId, "companyName");
   // console.log(`sessionId ${sessionId} details:`)
   req.userDetails = userDetails;
-  req.selfLei = selfLei;
+  req.companyName = companyName;
+  req.legalPersonIdentifier = legalPersonIdentifier;
   req.sessionId = sessionId;
   // console.log(userDetails)
   /*

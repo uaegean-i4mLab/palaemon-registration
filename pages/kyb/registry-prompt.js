@@ -21,7 +21,7 @@ class Wizard extends React.Component {
       userDetails: req.userDetails,
       selfLei: req.selfLei,
       sessionId: req.sessionId,
-      keycloakUrl: req.keycloakRedirectURI
+      keycloakUrl: req.keycloakRedirectURI,
     };
   }
 
@@ -35,34 +35,36 @@ class Wizard extends React.Component {
       });
     });
     //TODO add here the send email callback
-  
   }
 
-  proceedToKeycloak(){
-    console.log("proceed to keycloak")
-    window.location.href = this.props.keycloakUrl
+  proceedToKeycloak() {
+    console.log("proceed to keycloak");
+    window.location.href = this.props.keycloakUrl;
   }
 
   render() {
     let addToRegistryDiv = !this.state.addedToRegistry ? (
-      <div className="row" style={{ marginBottom: "3 rem"}}>
+      <div className="row" style={{ marginBottom: "3 rem" }}>
         <button onClick={this.addUserToRegistry}>Register</button>
       </div>
     ) : (
-      <div style={{ margin: "3 rem 3 rem 3 rem 3 rem"}}>Thank you for registering</div>
+      <div style={{ margin: "3 rem 3 rem 3 rem 3 rem" }}>
+        Thank you for registering
+      </div>
     );
 
     return (
       <div className="container" style={{ marginTop: "3rem" }}>
         {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
         <div className="row" style={{ marginBottom: "3rem" }}>
-          Would you like to add your KYB profile in the services public registry
-          in an easily Verifiable Format? If you opt in for this feature the
-          public profile of your organization will be easily verified by anyone
-          (public authorities, B2B transactions etc.) greatly facilitating your
-          dealings with these parties. If Yes, please click the “Register”
-          button, else click the “Next” button to send your KYB attributes to
-          the service that originated this flow
+          Please review the attributes retrieved, presented below. If you are
+          certain that these attributes correctly identify you please click the
+          Next button. Additionally, if you would like you can  add your Company’s KYB
+          profile in the public registry in an easily Verifiable Format? If you
+          opt in for this feature the public profile of your organization will
+          be easily verified by anyone (public authorities, B2B transactions
+          etc.) greatly facilitating your dealings with these parties. If Yes,
+          please click the “Register” button
         </div>
         <div className="row" style={{ marginBottom: "3rem" }}>
           Details:

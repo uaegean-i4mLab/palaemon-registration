@@ -8,33 +8,44 @@ class Wizard extends React.Component {
   constructor(props) {
     super(props);
     this.signAndProceed = this.signAndProceed.bind(this);
+    this.showDocument = this.showDocument.bind(this);
+    this.state = {
+      displayDocument: false,
+    };
   }
 
   static async getInitialProps({ reduxStore, req }) {
     //returned value here is getting mered with the mapstatetoprops
     // mapstatetoprops overrides these values if they match
+    let companyIdentifier = req.legalPersonIdentifier
+      ? req.legalPersonIdentifier
+      : req.companyName;
     return {
       userDetails: req.userDetails,
-      selfLei: req.selfLei,
+      legalPersonIdentifier: req.legalPersonIdentifier,
+      companyName: req.companyName,
+      companyIdentifier: companyIdentifier,
     };
   }
 
-  signAndProceed = ()=> {
-    window.location.href = "/kyb/registry-prompt"
+  signAndProceed = () => {
+    window.location.href = "/kyb/registry-prompt";
     // history.push("/kyb/registry-prompt");
-  }
+  };
+
+  showDocument =(e) => {
+    console.log("showdocument")
+    e.preventDefault();
+    this.setState({
+      displayDocument: true,
+    });
+  };
 
   render() {
-    return (
-      <div className="container" style={{ marginTop: "3rem" }}>
-        {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          Please validate your relationship with the declared company. To do so,
-          click the Sign button. This will result in the signing a qualified One
-          Time Signature (issued using your eIDAS eID profile) a document
-          validating your relationship with the declared document. To review the
-          document please click here
-        </div>
+    let documentDisplayDiv = !this.state.displayDocument ? (
+      <div></div>
+    ) : (
+      <div id="document">
         <div className="row" style={{ marginBottom: "3rem" }}>
           Document:
         </div>
@@ -52,11 +63,25 @@ class Wizard extends React.Component {
           <b>{this.props.userDetails.personal_number}</b>
           <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>
             {" "}
-            attest that I am affiliated with the company identified by the LEI
-            or Legal Name:
+            attest that I am affiliated with the company identified by the Legal
+            Company Identifier or Legal Name:
           </span>
-          <b>{this.props.selfLei}</b>.
+          <b>{this.props.companyIdentifier}</b>.
         </div>
+      </div>
+    );
+
+    return (
+      <div className="container" style={{ marginTop: "3rem" }}>
+        {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
+        <div className="row" style={{ marginBottom: "3rem" }}>
+          Please validate your relationship with the declared company. To do so,
+          click the Sign button. This will result in the signing a qualified One
+          Time Signature (issued using your eIDAS eID profile) a document
+          validating your relationship with the declared document. To review the
+          document please click <a href="#" onClick={this.showDocument}>here</a>
+        </div>
+        {documentDisplayDiv}
 
         <div className="row" style={{ marginBottom: "3rem" }}>
           <button onClick={this.signAndProceed}>Sign</button>
