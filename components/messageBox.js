@@ -1,3 +1,4 @@
+/*
 import Link from "next/link";
 import React , { useState } from "react";
 import { Button } from "react-bootstrap";
@@ -16,4 +17,4 @@ function messageBox(props) {
     );
 };
 
-export default messageBox;
+export default messageBox;*/

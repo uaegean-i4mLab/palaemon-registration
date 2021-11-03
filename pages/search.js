@@ -1,7 +1,14 @@
 import Head from 'next/head'
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Layout from '../components/layout'
 import utilStyles from '../styles/utils.module.css';
+import GridContainer from "../components/Grid/GridContainer";
+import GridItem from "../components/Grid/GridItem";
+
+import styles from "styles/jss/nextjs-material-kit/pages/landingPageSections/workStyle.js";
+import {makeStyles} from "@material-ui/core/styles";
+
+const useStyles = makeStyles(styles);
 
 /*export async function getServerSideProps(context) {
     const res = await fetch('/query/searchGet?lei='+data.lei+'&legalName='+data.legalName);
@@ -20,6 +27,7 @@ import utilStyles from '../styles/utils.module.css';
 
 
 export default function Home() {
+    const classes = useStyles();
     const [lei, setLei] = useState('');
     const [legalName, setLegalName] = useState('');
     const [countryCode, setCountryCode] = useState('');
@@ -88,7 +96,7 @@ export default function Home() {
                 </form>
                 {/*{JSON.stringify(kybList)}*/}
                 {kyb !== '' &&
-                <table>
+                /*<table>
                     <tbody>
                     <tr>
                         <td>Legal Name</td>
@@ -140,7 +148,115 @@ export default function Home() {
                     </tr>
                     </tbody>
 
-                </table>
+                </table>*/
+                <div className={classes.section}>
+                    <GridContainer justifyContent="center">
+                        <GridItem cs={12} sm={12} md={8}>
+                            <h2 className={classes.title}>Results</h2>
+
+                            <GridContainer>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Legal Name</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.legal_name}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Legal Person Identifier</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.legal_person_identifier}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Jurisdiction Code</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.jurisdiction_code}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Business Role</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.business_role}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Address</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.address}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>LEI</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.lei}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Vat Registration</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.vat_registration}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Birthdate</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.birthdate}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Trading Status</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.trading_status}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Given Name</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.given_name}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Family Name</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.family_name}</div>
+                                </GridItem>
+                                <hr className={classes.hrLine}></hr>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textRight}>Sub Jurisdiction</div>
+
+                                </GridItem>
+                                <GridItem xs={12} sm={12} md={6}>
+                                    <div className={classes.textLeft}>{kyb.sub_jurisdiction}</div>
+                                </GridItem>
+
+
+                            </GridContainer>
+
+                        </GridItem>
+                    </GridContainer>
+                </div>
                 }
 
 
