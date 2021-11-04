@@ -65,6 +65,8 @@ const customInputStyle = {
     },
   },
   input: {
+    border: "2px",
+    borderColor: "black",
     color: "#495057",
     height: "unset",
     "&,&::placeholder": {

@@ -321,7 +321,7 @@ const buttonStyle = {
     padding: "1.125rem 2.25rem",
     fontSize: "0.875rem",
     lineHeight: "1.333333",
-    borderRadius: "0.2rem",
+    borderRadius: "8px",
   },
   sm: {
     padding: "0.40625rem 1.25rem",

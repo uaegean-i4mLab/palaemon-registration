@@ -66,7 +66,7 @@ const containerFluidAuto = {
   paddingLeft: "15px",
   marginRight: "auto",
   marginLeft: "auto",
-  width: "auto",
+  width: "85%",
 };
 
 
