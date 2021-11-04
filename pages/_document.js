@@ -26,10 +26,24 @@ class MyDocument extends Document {
                         rel="stylesheet"
                     />
                 </Head>
-                <body style={{margin: 0 + 'px' }}>
+                <body>
                 <div id="page-transition"></div>
                 <Main />
                 <NextScript />
+                <style jsx global>{`
+                html{
+                    height: 100%;
+                }
+                body {
+                    margin: 0px;
+                    height:100%;
+                }
+          #__next {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+          }
+        `}</style>
                 </body>
             </Html>
         );

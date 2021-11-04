@@ -3,7 +3,6 @@ import axios from "axios";
 import LayoutNew from "../../components/LayoutNew";
 import { connect } from "react-redux";
 import ValidateTable from "../../components/ValidateKYBComp";
-import WorkSection from "pages-sections/LandingPage-Sections/WorkSection.js";
 import Form1 from "../../components/Forms/Form1";
 import Form2 from "../../components/Forms/Form2";
 import Form3 from "../../components/Forms/Form3";
@@ -11,8 +10,6 @@ import Form4 from "../../components/Forms/Form4";
 import Form5 from "../../components/Forms/Form5";
 import Form6 from "../../components/Forms/Form6";
 import Head from "next/head";
-import GridItem from "../../components/Grid/GridItem";
-import GridContainer from "../../components/Grid/GridContainer";
 
 class QueryView extends React.Component {
   constructor(props) {
@@ -80,15 +77,9 @@ class QueryView extends React.Component {
           <Head>
             <title>Grids</title>
           </Head>
-
-          {/*<WorkSection handleChange={this.handleChange}/>*/}
-
-              <h5>
-                In order to build your KYB profile, first provide your company’s details below, and then click the “Retrieve Data” button. This will result in an eIDAS eID authentication.
-              </h5>
-              <form action="/start-login" method="post">
-          <Form6 handleChange={this.handleChange}/>
-              </form>
+          <form action="/start-login" method="post">
+            <Form6 handleChange={this.handleChange}/>
+          </form>
           {/*<label className="row">
             Company Name:
             <input

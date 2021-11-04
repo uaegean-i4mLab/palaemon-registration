@@ -1,139 +1,92 @@
 import React from "react";
 // @material-ui/core components
 import { makeStyles } from "@material-ui/core/styles";
-import InputAdornment from "@material-ui/core/InputAdornment";
-import Icon from "@material-ui/core/Icon";
-// @material-ui/icons
-import Email from "@material-ui/icons/Email";
-import People from "@material-ui/icons/People";
 // core components
-import Header from "components/Header/Header.js";
-import HeaderLinks from "components/Header/HeaderLinks.js";
-import Footer from "components/Footer/Footer.js";
 import GridContainer from "components/Grid/GridContainer.js";
 import GridItem from "components/Grid/GridItem.js";
 import Button from "components/CustomButtons/Button.js";
-import Card from "components/Card/Card.js";
-import CardBody from "components/Card/CardBody.js";
-import CardHeader from "components/Card/CardHeader.js";
-import CardFooter from "components/Card/CardFooter.js";
-import CustomInput from "components/CustomInput/CustomInput.js";
-import Stepper from "components/Stepper.js";
+import CustomInputNew from "components/CustomInput/CustomInputNew.js";
 
-import styles from "styles/jss/nextjs-material-kit/pages/loginPage.js";
+import styles from "styles/jss/nextjs-material-kit/components/formStyle.js";
 
 const useStyles = makeStyles(styles);
 
-export default function LoginPage(props) {
-    const [cardAnimaton, setCardAnimation] = React.useState("cardHidden");
-    setTimeout(function () {
-        setCardAnimation("");
-    }, 700);
+export default function Form6(props) {
     const classes = useStyles();
     const { ...rest } = props;
     return (
         <div className={classes.container}>
+            <h6 className={classes.headTitle}>
+                In order to build your KYB profile, first provide your company’s details below, and then click the “Retrieve Data” button. This will result in an eIDAS eID authentication.
+            </h6>
 
+                <h4 className={classes.customH4 }>
+                    Company Details Form
+                </h4>
+                <GridContainer>
 
-                            <h4 className={classes.textLeft }>
-                                Company Details Form
-                            </h4>
-                            <GridContainer>
+                    <GridItem xs={12} sm={12} md={6}>
+                        <CustomInputNew
+                            labelText="Company Name"
+                            id="companyName"
+                            formControlProps={{
+                                fullWidth: true,
+                            }}
+                            handleChange={props.handleChange}
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={6}>
+                        <CustomInputNew
+                            labelText="Company Country"
+                            id="companyCountry"
+                            formControlProps={{
+                                fullWidth: true,
+                            }}
+                            handleChange={props.handleChange}
+                        />
+                    </GridItem>
+                </GridContainer>
+                <h4 className={classes.customH4 }>
+                    Representative Form
+                </h4>
+                <GridContainer>
 
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="Company Name"
-                                        id="companyName"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        handleChange={props.handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="Company Country"
-                                        id="companyCountry"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        handleChange={props.handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="LEI"
-                                        id="lei"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        handleChange={props.handleChange}
-                                    />
-                                </GridItem>
-                            </GridContainer>
-                            <h4 className={classes.textLeft}>
-                                Representative Form
-                            </h4>
-                            <GridContainer>
+                    <GridItem xs={12} sm={12} md={6}>
+                        <CustomInputNew
+                            labelText="Name"
+                            id="name"
+                            formControlProps={{
+                                fullWidth: true,
+                            }}
+                            handleChange={props.handleChange}
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={6}>
+                        <CustomInputNew
+                            labelText="Surname"
+                            id="surname"
+                            formControlProps={{
+                                fullWidth: true,
+                            }}
 
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="Name"
-                                        id="name"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        inputProps={{
-                                            type: "text",
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <People className={classes.inputIconsColor} />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        handleChange={props.handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="Surname"
-                                        id="surname"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        inputProps={{
-                                            type: "text",
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <People className={classes.inputIconsColor} />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        handleChange={props.handleChange}
-                                    />
-                                </GridItem>
-                                <GridItem xs={12} sm={12} md={6}>
-                                    <CustomInput
-                                        labelText="email"
-                                        id="email"
-                                        formControlProps={{
-                                            fullWidth: true,
-                                        }}
-                                        inputProps={{
-                                            type: "email",
-                                            endAdornment: (
-                                                <InputAdornment position="end">
-                                                    <Email className={classes.inputIconsColor} />
-                                                </InputAdornment>
-                                            ),
-                                        }}
-                                        handleChange={props.handleChange}
-                                    />
-                                </GridItem>
-                            </GridContainer>
-                            <Button color="primary" size="lg">
-                                Retrieve
-                            </Button>
+                            handleChange={props.handleChange}
+                        />
+                    </GridItem>
+                    <GridItem xs={12} sm={12} md={12}>
+                        <CustomInputNew
+                            labelText="email"
+                            id="email"
+                            formControlProps={{
+                                fullWidth: true,
+                            }}
+
+                            handleChange={props.handleChange}
+                        />
+                    </GridItem>
+                </GridContainer>
+                <Button color="primary" size="lg">
+                    Retrieve
+                </Button>
         </div>
 
     );

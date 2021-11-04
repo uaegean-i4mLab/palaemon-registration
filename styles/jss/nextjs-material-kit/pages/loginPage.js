@@ -101,11 +101,15 @@ const signupPageStyle = {
     color: "#495057",
   },
   textLeft: {
-    color: "#999",
     textAlign: "left",
   },
+  customH4: {
+    color: "rgba(0, 0, 0, 0.87)",
+    textAlign: "left",
+    fontSize: "1.5rem",
+    overflowWrap: "break-word",
+  },
   textRight: {
-    color: "#999",
     textAlign: "right",
   },
   textCenter: {

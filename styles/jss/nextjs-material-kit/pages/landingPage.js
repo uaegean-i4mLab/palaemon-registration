@@ -3,7 +3,7 @@ import { container, containerAuto, title } from "styles/jss/nextjs-material-kit.
 const landingPageStyle = {
   container: {
     zIndex: "12",
-    color: "#FFFFFF",
+    color: "rgba(0, 0, 0, 0.87)",
     ...containerAuto,
   },
   title: {
@@ -63,8 +63,11 @@ const landingPageStyle = {
     },
   },
   jss413 : {
-    flex: "0 1 0%",
-    display: "flex"
+    display: "block",
+    height: "108px"
+  },
+  footerWrapper: {
+    position: "relative",
   }
 };
 

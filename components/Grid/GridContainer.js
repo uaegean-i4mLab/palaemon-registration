@@ -11,6 +11,7 @@ const styles = {
     marginRight: "0px",
     marginLeft: "-10px",
     width: "auto",
+    flex: "1 0 auto",
   },
 };
 
