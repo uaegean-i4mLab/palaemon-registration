@@ -6,6 +6,7 @@ const MyStepper = props => {
       <Stepper
         steps={props.steps}
         activeStep={props.activeNum}
+        activeTitleColor = {'#ffffff'}
         completeTitleColor = {'#00c642'}
         completeColor={'#00c642'}
       />

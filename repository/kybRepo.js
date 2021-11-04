@@ -84,5 +84,28 @@ function getUserByeIDASIdenitifier(personalIdentifier) {
   });
 }
 
+async function findByLeiAndLegalName(lei, legalName, countryCode) {
+    const filter = {};
+    if(lei !== ""){
+        filter.lei = lei;
+    }
+    if(legalName !== ""){
+        filter.legal_name = legalName;
+    }
+    if(countryCode !== ""){
+        filter.sub_jurisdiction = countryCode;
+    }
+    filter.provider = 'local'
+    return await Kyb.find(filter).exec();
+
+    /*promise.then(function (doc) {
+        console.log("@@@@@@@@@@@@@@@ kyb @@@@@@@@@@@@@@@");
+        console.log(doc);
+        return doc;
+    })*/
+    // return kyb;
+};
+
 module.exports.addDataToDb = addDataToDb;
 module.exports.getUserByeIDASIdenitifier = getUserByeIDASIdenitifier;
+module.exports.findByLeiAndLegalName = findByLeiAndLegalName;

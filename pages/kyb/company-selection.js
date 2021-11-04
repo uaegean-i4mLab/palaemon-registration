@@ -1,8 +1,18 @@
 import React from "react";
 import axios from "axios";
-import Layout from "../../components/Layout";
+import LayoutNew from "../../components/LayoutNew";
 import { connect } from "react-redux";
 import ValidateTable from "../../components/ValidateKYBComp";
+import WorkSection from "pages-sections/LandingPage-Sections/WorkSection.js";
+import Form1 from "../../components/Forms/Form1";
+import Form2 from "../../components/Forms/Form2";
+import Form3 from "../../components/Forms/Form3";
+import Form4 from "../../components/Forms/Form4";
+import Form5 from "../../components/Forms/Form5";
+import Form6 from "../../components/Forms/Form6";
+import Head from "next/head";
+import GridItem from "../../components/Grid/GridItem";
+import GridContainer from "../../components/Grid/GridContainer";
 
 class QueryView extends React.Component {
   constructor(props) {
@@ -60,24 +70,20 @@ class QueryView extends React.Component {
 
   render() {
     return (
-      <div className="container">
-        <div
-          className="row"
-          style={{ marginBottom: "3rem", marginTop: "3rem" }}
-        >
-          In order to build the KYB profile of your Company, please provide your
-          name and company’s details below, and then click the “Submit” button.
-        </div>
+        <LayoutNew home>
+          <Head>
+            <title>Grids</title>
+          </Head>
 
-        <form action="/start-login" method="post">
-          <div
-            className="row"
-            style={{ marginBottom: "2rem", marginTop: "1rem" }}
-          >
-            {" "}
-            <b>Company Details:</b>
-          </div>
-          <label className="row">
+          {/*<WorkSection handleChange={this.handleChange}/>*/}
+
+              <h5>
+                In order to build your KYB profile, first provide your company’s details below, and then click the “Retrieve Data” button. This will result in an eIDAS eID authentication.
+              </h5>
+              <form action="/start-login" method="post">
+          <Form6 handleChange={this.handleChange}/>
+              </form>
+          {/*<label className="row">
             Company Name:
             <input
               type="text"
@@ -117,9 +123,9 @@ class QueryView extends React.Component {
 
           <div className="row">
             <input type="submit" disabled={!this.state.isNextEnabled} />
-          </div>
-        </form>
-      </div>
+
+          </div>*/}
+        </LayoutNew>
     );
   }
 }

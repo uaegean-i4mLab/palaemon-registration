@@ -10,6 +10,8 @@
     "preinstall": "npx npm-force-resolutions"
   },
   "dependencies": {
+    "@emotion/react": "^11.5.0",
+    "@emotion/styled": "^11.3.0",
     "@fortawesome/fontawesome-svg-core": "^1.2.32",
     "@fortawesome/free-solid-svg-icons": "^5.15.1",
     "@fortawesome/react-fontawesome": "^0.1.11",
@@ -22,8 +24,8 @@
     "base36id": "^1.0.3",
     "base64url": "^3.0.1",
     "body-parser": "^1.19.0",
-    "bootstrap": "^4.5.3",
     "chai": "^4.2.0",
+    "classnames": "^2.3.1",
     "compose-middleware": "^5.0.1",
     "connect-memcached": "^1.0.0",
     "cookie-parser": "^1.4.5",
@@ -44,6 +46,7 @@
     "jquery": "^3.6.0",
     "jsesc": "^3.0.1",
     "jsonwebtoken": "^8.5.1",
+    "jsx-runtime": "^1.2.0",
     "jwt-decode": "^3.1.2",
     "keycloak-connect": "^13.0.1",
     "keycloak-connect-multirealm": "^1.2.0",
@@ -52,6 +55,8 @@
     "moment-timezone": "^0.5.31",
     "mongoose": "^6.0.10",
     "next": "^9.4.4",
+    "next-compose-plugins": "^2.2.1",
+    "next-images": "^1.8.1",
     "ngrok": "^3.3.0",
     "node-cache": "^5.1.2",
     "node-jose": "^2.0.0",
@@ -65,8 +70,8 @@
     "qrcode": "^1.4.4",
     "qs": "^6.9.4",
     "react": "16.11.0",
-    "react-bootstrap": "^1.4.0",
     "react-dom": "16.11.0",
+    "react-emotion": "^10.0.0",
     "react-redux": "^7.2.1",
     "react-router-dom": "^5.3.0",
     "react-stepper-horizontal": "^1.0.11",
@@ -88,7 +93,12 @@
     "winston": "^3.3.3"
   },
   "devDependencies": {
+    "@material-ui/core": "^4.12.3",
+    "@material-ui/icons": "^4.11.2",
+    "@material-ui/styles": "^4.11.4",
+    "@mui/material": "^5.0.6",
     "mocha": "^8.2.0",
-    "nodemon": "^2.0.6"
+    "nodemon": "^2.0.6",
+    "prop-types": "^15.7.2"
   }
 }

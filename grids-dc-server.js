@@ -28,6 +28,8 @@ import {sendEmailVCInvite} from "./controllers/emailControllers"
 import { jwksController } from "./controllers/jwks-controllers";
 import { addToRegistry } from "./controllers/registryControllers";
 import { subscribe } from "./services/sse-service";
+import {searchDbController} from "./controllers/seach-db-controllers";
+import mongoose from "mongoose";
 
 // import winston from "winston";
 // import expressWinston from "express-winston";
@@ -242,6 +244,8 @@ app.prepare().then(async () => {
   server.use("/login", passportController);
 
   server.use("/jwks", jwksController);
+  server.use("/query", searchDbController);
+  server.use('/jwks', jwksController);
   server.all("*", async (req, res) => {
     return handle(req, res);
   });
