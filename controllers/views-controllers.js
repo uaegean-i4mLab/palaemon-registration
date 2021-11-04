@@ -42,6 +42,7 @@ const companySelection = async (app, req, res) => {
   // Set cookie
   res.cookie("sessionId", sessionId, options); // options is optional
   res.cookie("extSessionId", externalSessionId, options);
+  res.cookie("kyb", "false", options); // options is optional
   return app.render(req, res, "/kyb/company-selection", req.query);
 };
 
@@ -49,11 +50,17 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
   // let lei = req.body.lei;
   let companyName = req.body.companyName;
   let legalPersonIdentifier = req.body.legal_person_identifier;
-  
+  let email = req.body.email;
+
   let claims = defaultClaims;
   let sessionId = req.cookies.sessionId;
-  await setOrUpdateSessionData(sessionId, "legalPersonIdentifier", legalPersonIdentifier);
+  await setOrUpdateSessionData(
+    sessionId,
+    "legalPersonIdentifier",
+    legalPersonIdentifier
+  );
   await setOrUpdateSessionData(sessionId, "companyName", companyName);
+  await setOrUpdateSessionData(sessionId, "email", email);
   // await setOrUpdateSessionData(sessionId, "companyCountry", companyCountry);
 
   if (companyName || legalPersonIdentifier) {
@@ -97,7 +104,10 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
 const validateRelationship = async (app, req, res, endpoint) => {
   let sessionId = req.cookies.sessionId;
   let userDetails = await getSessionData(sessionId, "userDetails");
-  let legalPersonIdentifier = await getSessionData(sessionId, "legalPersonIdentifier");
+  let legalPersonIdentifier = await getSessionData(
+    sessionId,
+    "legalPersonIdentifier"
+  );
   let companyName = await getSessionData(sessionId, "companyName");
   // console.log(`sessionId ${sessionId} details:`)
   req.userDetails = userDetails;
@@ -141,6 +151,55 @@ const registryPrompt = async (app, req, res, endpoint) => {
       }&userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`;
   return app.render(req, res, "/kyb/registry-prompt", req.query);
 };
+
+const issueKYB = async (app, req, res, serverPassport, oidcClient) => {
+  let sessionId = req.query.sessionId;
+  let claims = defaultClaims;
+  let redirectURI = process.env.ISSUE_REDIRECT_URI
+    ? process.env.ISSUE_REDIRECT_URI
+    : "http://localhost:5000/vc/response/kyb";
+
+  const headerRaw = {
+    alg: "none",
+    typ: "JWT",
+  };
+  const payloadRaw = {
+    sub: "mock",
+    aud: "mock",
+    iss: "http://localhost",
+    client_id: oidcClient.client_id,
+    redirect_uri: redirectURI,
+    claims: claims,
+  };
+  const header = JSON.stringify(headerRaw);
+  const payload = JSON.stringify(payloadRaw);
+  let jwt = `${urlEncode(header)}.${urlEncode(payload)}.`;
+  updatePassportConfig(serverPassport, claims, oidcClient, jwt);
+  let options = {
+    maxAge: 1000 * 60 * 15, // would expire after 5 minutes
+    httpOnly: true, // The cookie only accessible by the web server
+    signed: false, // Indicates if the cookie should be signed
+  };
+  // Set cookie
+  res.cookie("kyb", sessionId, options); // options is optional
+  res.cookie("sessionId", sessionId, options); // options is optional
+  res.redirect(307, "/login");
+  // return app.render(req, res, "/vc/issue/kyb", req.query);
+};
+
+
+const issueVcKYBResponse = async (app, req, res, endpoint, serverPassport, oidcClient) => {
+  let sessionId = req.query.sessionId
+  let userDetails = await getSessionData(sessionId, "userDetails");
+  // console.log(updatedUsersAttributes);
+  req.session.DID = false;
+  req.session.userData = userDetails;
+  req.session.sessionId = sessionId;
+  req.session.endpoint = endpoint;
+  req.session.baseUrl = process.env.BASE_PATH;
+  return app.render(req, res, "/vc/issue/kyb", req.query);
+
+}
 
 const issueEidas = async (app, req, res, endpoint) => {
   //if we are redirected from mobile
@@ -250,4 +309,6 @@ export {
   startLogin,
   validateRelationship,
   registryPrompt,
+  issueKYB,
+  issueVcKYBResponse
 };

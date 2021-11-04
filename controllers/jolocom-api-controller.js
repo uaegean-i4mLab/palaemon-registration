@@ -73,7 +73,7 @@ const handleConnectionResponse = async (req, res, issuerAgent) => {
 };
 
 const handleVCRequestController = async (req, res, issuerAgent, endpoint) => {
-  let sealSession = req.body.sealSession;
+  let sessionId = req.body.sessionId;
   let vcType = req.body.vcType;
   let isMobile = req.body.isMobile ? true : false;
   let userData = req.session.userData;
@@ -81,13 +81,13 @@ const handleVCRequestController = async (req, res, issuerAgent, endpoint) => {
   // req.session.baseUrl = process.env.BASE_PATH;
 
   let callback = process.env.BASE_PATH
-    ? `${endpoint}/${process.env.BASE_PATH}/offerResponse?vcType=${vcType}&seal=${sealSession} `
-    : endpoint + `/offerResponse?vcType=${vcType}&seal=${sealSession} `;
+    ? `${endpoint}/${process.env.BASE_PATH}/offerResponse?vcType=${vcType}&sessionId=${sessionId} `
+    : endpoint + `/offerResponse?vcType=${vcType}&sessionId=${sessionId} `;
   // console.log("handleVCRequestController userData in session")
   // console.log(userData)
   console.log("handleVCRequestController the callback is " + callback);
   let response = await makeCredentialOffer(
-    sealSession,
+    sessionId,
     vcType,
     userData,
     callback,

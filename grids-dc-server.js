@@ -10,6 +10,8 @@ import {
   startLogin,
   validateRelationship,
   registryPrompt,
+  issueKYB,
+  issueVcKYBResponse,
 } from "./controllers/views-controllers";
 import {
   startSession,
@@ -22,6 +24,7 @@ import {
   handleVCRequestController,
   handleVCResponseController,
 } from "./controllers/jolocom-api-controller";
+import {sendEmailVCInvite} from "./controllers/emailControllers"
 import { jwksController } from "./controllers/jwks-controllers";
 import { addToRegistry } from "./controllers/registryControllers";
 import { subscribe } from "./services/sse-service";
@@ -103,26 +106,33 @@ app.prepare().then(async () => {
   server.get("/events", subscribe);
 
   //view
-
   server.get(["/company-selection"], async (req, res) => {
     console.log("/company-selection");
     return companySelection(app, req, res, serverConfiguration.endpoint);
   });
-
   server.post(["/start-login"], async (req, res) => {
     console.log("/start-login");
     startLogin(app, req, res, serverPassport, oidcClient);
   });
-
   server.get(["/validate-relation"], async (req, res) => {
     console.log("/validate-relation");
     return validateRelationship(app, req, res, serverConfiguration.endpoint);
   });
-
   server.get(["/kyb/registry-prompt"], async (req, res) => {
     console.log("/kyb/registry-prompt");
     return registryPrompt(app, req, res, serverConfiguration.endpoint);
   });
+  // view VC controllers
+  server.get(["/vc/issue/kyb"], async (req, res) => {
+    console.log("/vc/issue/kyb");
+    return issueKYB(app, req, res, serverPassport, oidcClient);
+  });
+  //issueVcKYBResponse
+  server.get(["/vc/issue/kybResponse"], async (req, res) => {
+    console.log("/vc/issue/kybResponse");
+    return issueVcKYBResponse(app, req, res,  serverConfiguration.endpoint, serverPassport, oidcClient);
+  });
+
 
   server.get(["/vc/issue/eidas"], async (req, res) => {
     console.log("/vc/issue/eidas");
@@ -137,7 +147,6 @@ app.prepare().then(async () => {
       serverConfiguration.endpoint
     );
   });
-
   server.get(["/vc/issue/myID"], async (req, res) => {
     console.log("/vc/issue/myID");
     return issueMyID(app, req, res, serverConfiguration.endpoint);
@@ -158,6 +167,11 @@ app.prepare().then(async () => {
     await addToRegistry(req,res);
   });
 
+  //email
+  server.post(["/email/send"], async (req, res) => {
+    console.log("/email/send");  
+    await sendEmailVCInvite(req,res);
+  });
 
   //seal
   server.post(["/seal/start-session"], async (req, res) => {

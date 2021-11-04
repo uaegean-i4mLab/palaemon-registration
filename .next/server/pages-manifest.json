@@ -1,7 +1,5 @@
 {
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
-  "/_document": "pages/_document.js",
-  "/kyb/validate-relation": "pages/kyb/validate-relation.js",
-  "/kyb/registry-prompt": "pages/kyb/registry-prompt.js"
+  "/_document": "pages/_document.js"
 }

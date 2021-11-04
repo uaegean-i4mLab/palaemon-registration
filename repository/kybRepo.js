@@ -36,6 +36,7 @@ function addDataToDb(kybData) {
       given_name: kybData.given_name,
       family_name: kybData.family_name,
       sub_jurisdiction: kybData.sub_jurisdiction,
+      personal_number:  kybData.personal_number,
     });
 
     console.log("kybRepo will try to save");
@@ -53,4 +54,35 @@ function addDataToDb(kybData) {
   });
 }
 
+
+//TODO ensure this works correcttly
+function getUserByeIDASIdenitifier(personalIdentifier) {
+  console.log(`kybRepo.js:: searching for ${personalIdentifier}`)
+  return new Promise((resolve, reject) => {
+    Kyb.findOne(
+      {
+        legal_person_identifier: personalIdentifier,
+        provider: "local",
+      },
+      function (err, kyb) {
+        if (err) {
+          console.log(err);
+          reject(false);
+        }
+        if (kyb) {
+          console.log(
+            "KYB already exists in DB with legal_person_identifier : " +
+              kyb.legal_person_identifier
+          );
+          resolve(kyb);
+          return;
+        }else{
+          resolve(undefined)
+        }
+      }
+    );
+  });
+}
+
 module.exports.addDataToDb = addDataToDb;
+module.exports.getUserByeIDASIdenitifier = getUserByeIDASIdenitifier;

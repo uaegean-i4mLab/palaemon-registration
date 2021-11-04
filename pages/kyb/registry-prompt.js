@@ -29,11 +29,15 @@ class Wizard extends React.Component {
     let sessionId = this.props.sessionId;
     const reqObj = { sessionId: sessionId };
     axios.post("/registry/add", reqObj).then((response) => {
-      console.log(response);
+      // console.log(response);
       this.setState({
         addedToRegistry: true,
       });
-    });
+    }).then( () =>{
+      axios.post("/email/send", {sessionId: sessionId, issueLink:"thisisalink"}).then((response) => {
+        // console.log(response);
+        console.log("email sent ok")
+    })});
     //TODO add here the send email callback
   }
 

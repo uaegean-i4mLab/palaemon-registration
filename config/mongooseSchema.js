@@ -16,6 +16,7 @@ const KYBSchema = new mongoose.Schema({
   trading_status: { type: String, default: "" },
   given_name: { type: String, default: "" },
   family_name: { type: String, default: "" },
+  personal_number: { type: String, default: "" },
   sub_jurisdiction: { type: String, default: "" },
 });
 

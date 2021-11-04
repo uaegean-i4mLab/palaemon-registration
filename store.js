@@ -11,6 +11,7 @@ const initialState = {
   requestSignature: null,
   sessionData: null,
   serverSessionId: null,
+  sessionId: null,
   uuid: null,
   vcSent: false,
   userSelection: [], // the attributes selected by the user to be included in a VC,
@@ -64,6 +65,7 @@ export const actionTypes = {
   SET_DID_TRUE: "SES_DID_TRUE",
 
   SET_SEAL_SESSION: "SET_SEAL_SESSION",
+  SET_SESSION_ID: "SET_SE",
 
   SET_CALLBACK: "SET_CALLBACK",
   SET_EIDAS_URI_PORT: "SET_EIDAS_URI_PORT",
@@ -124,6 +126,12 @@ const reducer = (state = initialState, action) => {
         ...state,
         sealSession: action.data,
       };
+
+      case actionTypes.SET_SESSION_ID:
+        return {
+          ...state,
+          sessionId: action.data,
+        };
 
     case actionTypes.SET_DID_TRUE:
       return {
@@ -293,6 +301,7 @@ export function startSession(sessionId, sessionStatus) {
 
 export function setServerSessionId(sessionId) {
   return (dispatch) => {
+    // console.log("store.js setServerSessionId with " +sessionId)
     dispatch({
       type: actionTypes.SET_SERVER_SESSION_ID,
       data: sessionId,
@@ -302,8 +311,8 @@ export function setServerSessionId(sessionId) {
 
 export function setSessionData(sessionData) {
   return (dispatch) => {
-    console.log(`store.js setSessionData called with::`);
-    console.log(sessionData)
+    // console.log(`store.js setSessionData called with::`);
+    // console.log(sessionData)
     dispatch({
       type: actionTypes.SET_SERVER_SESSION_DATA,
       data: sessionData,
@@ -541,13 +550,13 @@ export function makeAndPushVC(
 export function requestVC(
   url,
   vcType,
-  sealSession,
+  sessionId,
   isMobile = false
 ) {
   return (dispatch) => {
     axios
       .post(url, {
-        sealSession: sealSession,
+        sessionId: sessionId,
         vcType: vcType,
         isMobile: isMobile,
       })
@@ -572,6 +581,16 @@ export function setSealSession(sessionId) {
   return (dispatch) => {
     dispatch({
       type: actionTypes.SET_SEAL_SESSION,
+      data: sessionId,
+    });
+  };
+}
+
+
+export function setSessionId(sessionId) {
+  return (dispatch) => {
+    dispatch({
+      type: actionTypes.SET_SESSION_ID,
       data: sessionId,
     });
   };
@@ -607,7 +626,7 @@ export function makeOnlyConnectionRequest(
   }
   return (dispatch) => {
     dispatch({ type: actionTypes.MAKE_QR_AUTH_REQUEST });
-    axios.post(`${baseUrl}onlyConnectionRequest`, postData).then((data) => {
+    axios.post(`${baseUrl}/makeConnectionRequest`, postData).then((data) => {
       console.log(
         "store.js -- onlyConnectionRequest:: got the data form the server"
       );

@@ -46,7 +46,7 @@ const PairOrCard = props => {
       <div>
         <QrPrompt
           qrData={props.qrData}
-          message={"  UAegean Issuer Service is requesting to connect with your wallet:"}
+          message={"The KYB Custodian Service is requesting to connect with your wallet:"}
           permissions={["Push Notifications"]}
           baseUrl={props.baseUrl}
         />
@@ -68,6 +68,7 @@ const PairOrCard = props => {
             permissions={["Push Credential"]}
             baseUrl={props.baseUrl}
             prompt={"Scan the QR code with your Jolocom Smart Wallet to receive your Credential!"}
+            isVCOffer={true}
           />
           <SSE
             uuid={props.uuid}

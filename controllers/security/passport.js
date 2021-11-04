@@ -14,6 +14,7 @@ const repo = require("../../repository/kybRepo");
 const { JWK, JWE } = require("node-jose");
 import { defaultClaims } from "../../config/defaultOidcClaims";
 import { getSessionData, setOrUpdateSessionData } from "../../services/redis";
+import {getUserByeIDASIdenitifier} from "../../repository/kybRepo"
 
 // Part 3, create a JWKS
 const keyStore = jose.JWK.createKeyStore();
@@ -41,12 +42,19 @@ const getConfiguredPassport = async (
   let _redirect_uri = isProduction
     ? process.env.OIDC_REDIRECT_URI
     : `http://localhost:5000/login/callback`;
+
+  let vc_redirect_uri = isProduction
+    ? process.env.VC_REDIRECT_URI
+    : `http://localhost:5000/vc/response/kyb`;
+
   let jwks_uri = process.env.JWKS_URI
     ? process.env.JWKS_URI
     : `${serverEndpoint}/jwks`;
 
   // Part 4a, get dynamic registration client id and secret
-  const dynamicClient = JSON.parse(await getDynClient(_redirect_uri, jwks_uri));
+  const dynamicClient = JSON.parse(
+    await getDynClient([_redirect_uri, vc_redirect_uri], jwks_uri)
+  );
   const dynClientId = dynamicClient.client_id;
   const dynClientSecret = dynamicClient.client_secret;
 
@@ -90,10 +98,10 @@ const getConfiguredPassport = async (
   });
 
   // creates a dynamic client for registration
-  function getDynClient(redirectURI, jwksURI) {
+  function getDynClient(redirectURIs, jwksURI) {
     const data = JSON.stringify({
       application_type: "web",
-      redirect_uris: [redirectURI],
+      redirect_uris: redirectURIs,
       client_name: "GridsUAegean",
       subject_type: "pairwise",
       token_endpoint_auth_method: "client_secret_basic",
@@ -143,7 +151,7 @@ const getConfiguredPassport = async (
   router.post("/", passport.authenticate("curity")); //listens to /login
   router.get(
     "/callback",
-    (req, res, next) => {
+    async (req, res, next) => {
       // console.log(req.session)
       // console.log("***************")
       // console.log(req.sessionStore.sessions)
@@ -156,7 +164,7 @@ const getConfiguredPassport = async (
       next();
     },
     passport.authenticate("curity", { failureRedirect: "/login" }), //listens to /login/callback
-    (req, res) => {
+    async (req, res) => {
       console.log("passport.js:: will now redirect to the view");
       // console.log(req.user);
       // read cookies
@@ -166,7 +174,27 @@ const getConfiguredPassport = async (
       let sessionId = req.cookies.sessionId;
       // console.log(`sessionId: ${sessionId}`)
       setOrUpdateSessionData(sessionId, "userDetails", req.user);
-      res.redirect("/validate-relation");
+      let redirect_uri =
+        req.cookies.kyb === "false"
+          ? "/validate-relation"
+          : `/vc/issue/kybResponse?sessionId=${req.cookies.kyb}`;
+
+      if( req.cookies.kyb !== "false"){
+        let personalIdentifier = req.user.personal_number;
+        console.log("passport.js passport.authenticate :: user with eIDAS " + personalIdentifier)
+        //TODO call the registry for user data
+        //if not found then error
+        let userFound = await getUserByeIDASIdenitifier(personalIdentifier)
+        if(!userFound){
+          redirect_uri= "/userNotFound"
+        }else{
+          console.log(`founda mathcing user in the public registry for ${personalIdentifier}`)
+        }
+      }
+      
+      
+       console.log(`will redirect to ${redirect_uri}`);
+      res.redirect(redirect_uri);
     }
   );
   return { passport: passport, client: client };
