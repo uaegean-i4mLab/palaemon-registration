@@ -26,6 +26,7 @@ export default function CustomInput(props) {
         white,
         inputRootCustomClasses,
         success,
+        name,
     } = props;
 
     const labelClasses = classNames({
@@ -75,6 +76,7 @@ export default function CustomInput(props) {
                     disabled: classes.disabled,
                 }}
                 id={id}
+                name={name}
                 onChange={props.handleChange}
                 {...inputProps}
             />

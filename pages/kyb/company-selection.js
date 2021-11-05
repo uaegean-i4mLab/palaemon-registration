@@ -8,7 +8,7 @@ import Form2 from "../../components/Forms/Form2";
 import Form3 from "../../components/Forms/Form3";
 import Form4 from "../../components/Forms/Form4";
 import Form5 from "../../components/Forms/Form5";
-import Form6 from "../../components/Forms/Form6";
+import Form6 from "../../components/Forms/CompanySelectionForm";
 import Head from "next/head";
 
 class QueryView extends React.Component {
@@ -58,7 +58,7 @@ class QueryView extends React.Component {
   stringNotEmpty(s) {
     if (s) {
       let result = s.length > 0;
-      console.log(`not empty ${s}:: ${result}`);
+      // console.log(`not empty ${s}:: ${result}`);
 
       return result;
     }
@@ -72,7 +72,7 @@ class QueryView extends React.Component {
             <title>Grids</title>
           </Head>
           <form action="/start-login" method="post">
-            <Form6 handleChange={this.handleChange}/>
+            <Form6 handleChange={this.handleChange} isNextEnabled={this.state.isNextEnabled}/>
           </form>
           {/*<label className="row">
             Company Name:
