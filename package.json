@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "ENDPOINT='http://localhost:5000'  node -r esm grids-dc-server.js",
     "build": "next build",
-    "start": "node -r esm server.js",
+    "start": "node -r esm grids-dc-server.js",
     "test": "mocha --require esm",
     "preinstall": "npx npm-force-resolutions"
   },
@@ -28,6 +28,7 @@
     "classnames": "^2.3.1",
     "compose-middleware": "^5.0.1",
     "connect-memcached": "^1.0.0",
+    "connect-redis": "^6.0.0",
     "cookie-parser": "^1.4.5",
     "did-jwt": "^4.6.2",
     "did-resolver": "^2.1.1",
@@ -69,7 +70,8 @@
     "qr-image": "^3.2.0",
     "qrcode": "^1.4.4",
     "qs": "^6.9.4",
-    "react": "16.11.0",
+    "react": "16.14.0",
+    "react-bootstrap": "^2.0.2",
     "react-dom": "16.11.0",
     "react-emotion": "^10.0.0",
     "react-redux": "^7.2.1",
@@ -100,5 +102,12 @@
     "mocha": "^8.2.0",
     "nodemon": "^2.0.6",
     "prop-types": "^15.7.2"
+  },
+  "type": "commonjs",
+  "exports": {
+    ".": "./grids-dc-server.js",
+    "./jsx-dev-runtime": "./jsx-dev-runtime.js",
+    "./jsx-runtime": "./jsx-runtime.js",
+    "./": "./"
   }
 }

@@ -156,11 +156,13 @@ const getConfiguredPassport = async (
       // console.log("***************")
       // console.log(req.sessionStore.sessions)
       // console.log(req.sessionStore.sessions)
-      let key = Object.keys(req.sessionStore.sessions)[0];
-      let oidcSession = JSON.parse(req.sessionStore.sessions[key])[
-        "oidc:vm.project-grids.eu"
-      ];
-      req.session["oidc:vm.project-grids.eu"] = oidcSession;
+      // console.log(req.sessionStore)
+
+      // let key = Object.keys(req.sessionStore.sessions)[0];
+      // let oidcSession = JSON.parse(req.sessionStore.sessions[key])[
+      //   "oidc:vm.project-grids.eu"
+      // ];
+      // req.session["oidc:vm.project-grids.eu"] = oidcSession;
       next();
     },
     passport.authenticate("curity", { failureRedirect: "/login" }), //listens to /login/callback
@@ -220,9 +222,11 @@ function getDataFromDPs(_user_info_request, _user_info_port, accessToken) {
       res.on("end", async function () {
         const body = Buffer.concat(chunks);
         console.log("******* USER INFO **********************");
-        console.log(body.toString());
-        console.log("******* USER INFO END **********************");
+        // console.log(body.toString());
         const resJson = JSON.parse(body.toString());
+        console.log(resJson);
+        console.log("******* USER INFO END **********************");
+        //TODO consolidate many sources!!
         if (resJson._claim_sources.src1) {
           resolve(
             await sendToken(
@@ -270,6 +274,9 @@ async function sendToken(accessToken, endpoint) {
         const ks = fs.readFileSync("keys.json");
         jose.JWK.asKeyStore(ks.toString()).then(async (keyStore) => {
           //decrypt received data
+          console.log("===========>Response from DP::")
+            console.log(payload)
+          console.log("===========><==================")
           const decrypted = await JWE.createDecrypt(keyStore).decrypt(payload);
           const body = Buffer.from(decrypted.plaintext);
           const resJson = JSON.parse(body.toString());

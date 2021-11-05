@@ -1,6 +1,6 @@
 const moment = require("moment-timezone");
 const crypto = require("crypto");
-const TextEncoder= require("util").TextEncoder
+const { TextEncoder, TextDecoder } = require("util");
 const base64url = require('base64url');
 const NodeRSA = require("node-rsa");
 const https = require("https");

@@ -41,6 +41,7 @@ class QueryView extends React.Component {
       [name]: value,
     });
     if (
+      this.stringNotEmpty(this.state.country)  &&
       this.stringNotEmpty(this.state.email) &&
       (this.stringNotEmpty(this.state.companyName) ||
         this.stringNotEmpty(this.state.legal_person_identifier))

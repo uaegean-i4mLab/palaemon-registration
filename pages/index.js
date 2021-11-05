@@ -1,6 +1,5 @@
 import Head from 'next/head'
 import LayoutNew from '../components/LayoutNew'
-import Layout from '../components/Layout'
 import utilStyles from '../styles/utils.module.css'
 import Link from "next/link";
 import MessageBox from "../components/messageBox"

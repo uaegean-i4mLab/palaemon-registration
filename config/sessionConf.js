@@ -1,32 +1,32 @@
 const session = require("express-session");
-const MemcachedStore = require("connect-memcached")(session);
+const connectRedis = require("connect-redis");
+const redis = require('redis');
+
+
+const RedisStore = connectRedis(session);
+//Configure redis client
+let redisUrl = process.env.REDIS?process.env.REDIS:"localhost"
+const redisClient = redis.createClient({
+  host: redisUrl,
+  port: 6379,
+});
 
 const getSessionConfg = (isProduction) => {
   const memoryStore = new session.MemoryStore();
-  const cacheStore = new MemcachedStore({
-    hosts: [
-      process.env.MEMCACHED_URL
-        ? process.env.MEMCACHED_URL
-        : "http://localhost:11211",
-    ],
-    secret: "123, easy as ABC. ABC, easy as 123", // Optionally use transparent encryption for memcache session data
-    ttl: process.env.TTL ? process.env.TTL : 300,
-    maxExpiration: 300,
-  });
   const SESSION_CONF = {
     secret: "this is my super super secret, secret!! shhhh",
     resave: false,
     saveUninitialized: false,
     cookie: { maxAge: 60 * 60 * 1000 }, // 1 hour
-    store: memoryStore,
+    store: new RedisStore({ client: redisClient }),
     maxExpiration: 90000,
-    cookie: { secure: false }
+    cookie: { secure: false },
   };
   if (isProduction) {
     console.log(
       `will set sessionstore to memcache ${process.env.MEMCACHED_URL}`
     );
-    SESSION_CONF.store = cacheStore;
+    SESSION_CONF.store = new RedisStore({ client: redisClient });
   }
   if (process.env.HTTPS_COOKIES === true) {
     SESSION_CONF.cookie.secure = true; // serve secure cookies, i.e. only over https, only for production
@@ -35,16 +35,7 @@ const getSessionConfg = (isProduction) => {
 };
 
 const getCacheStore = () => {
-  return new MemcachedStore({
-    hosts: [
-      process.env.MEMCACHED_URL
-        ? process.env.MEMCACHED_URL
-        : "http://localhost:11211",
-    ],
-    secret: "123, easy as ABC. ABC, easy as 123", // Optionally use transparent encryption for memcache session data
-    ttl: process.env.TTL ? process.env.TTL : 300,
-    maxExpiration: 300,
-  });
+  return new RedisStore({ client: redisClient })
 };
 
 exports.getSessionConfg = getSessionConfg;

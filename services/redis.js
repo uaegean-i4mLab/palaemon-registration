@@ -6,7 +6,8 @@ const DEFAULT_EXPIRATION = 300;
 
 function getClient() {
   if (_client === null) {
-    _client = Redis.createClient(); // this can take config stuff
+    let redisUrl = process.env.REDIS?process.env.REDIS:"localhost"
+    _client = Redis.createClient(6379, redisUrl); // this can take config stuff
   }
   return _client;
 }

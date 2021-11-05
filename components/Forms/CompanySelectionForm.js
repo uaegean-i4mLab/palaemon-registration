@@ -52,6 +52,19 @@ export default function Form6(props) {
               handleChange={props.handleChange}
             />
           </GridItem>
+
+          <GridItem xs={12} sm={12} md={6}>
+            <CustomInputNew
+              labelText="Company Country"
+              name="country"
+              id="country"
+              formControlProps={{
+                fullWidth: true,
+              }}
+              handleChange={props.handleChange}
+            />
+          </GridItem>
+
         </GridContainer>
         <h4 className={classes.customH4}>Representative Form</h4>
         <GridContainer>

@@ -1,8 +1,9 @@
 const ngrok = require("ngrok");
+const fs = require("fs");
 const {
   getConfiguredPassport,
   addClaimsToStrategy,
-} = require ("../controllers/security/passport");
+} = require("../controllers/security/passport");
 
 const configServer = (
   server,
@@ -47,10 +48,18 @@ const configServer = (
             `running in production is ${isProduction} and port is ${port}`
           );
           serverConfiguration.endpoint = process.env.ENDPOINT;
-          const passport = await getConfiguredPassport(
+          console.log(`configuring the passport`);
+          let { passport, client } = await getConfiguredPassport(
             isProduction,
             serverConfiguration.endpoint
           );
+          console.log(`serverConfig.js:: finshed passport config`)
+          console.log(client)
+          resolve({
+            endpoint: serverConfiguration.endpoint,
+            passport: passport,
+            client: client,
+          });
         } else {
           console.log(`running in development`);
           ngrok.connect(port).then(async (ngrokUrl) => {
