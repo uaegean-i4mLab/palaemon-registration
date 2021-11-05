@@ -36,18 +36,17 @@ export default function Footer(props) {
             <div className="lfImgAndText--text">
               <div>
                 <b>Co-financed by the European Union</b>
-                <hr className="hrFtr"/>
+                <hr className="hrFtr" />
               </div>
-              <div>
-                Connecting Europe Facility
-              </div>
+              <div>Connecting Europe Facility</div>
             </div>
           </div>
           <div className="btmText">
             <p>
-              The UAegean ERASMUS myID Card Service has been co-financed<br/>
-              by the Connecting Europe Facility (CEF) of the European Union<br/>
-              (Seal Project: Grant Agreement No INEA/CEF/ICT/A2018/1633170)</p>
+              Grant Agreement under the Connection Europe Facility (CEF) <br/>
+              Telecommunications Sector <br />
+              Agreement number INEA/CEF/ICT/A2019/1926018
+            </p>
           </div>
           {/*<List className={classes.list}>
             <ListItem className={classes.inlineBlock}>
@@ -87,28 +86,26 @@ export default function Footer(props) {
               </a>
             </ListItem>
           </List>*/}
-
         </div>
         <div className={classes.right}>
           <div>
-            University of the Aegean | Dpt of Financial and Management Engineering | i4m Lab
+            University of the Aegean | Dpt of Financial and Management
+            Engineering | i4m Lab
           </div>
           <div>
-            Web address | Dpt: <Link simple color="primary" href={"http://www.fme.aegean.gr/"} >
-            <a>
-            http://www.fme.aegean.gr/
+            Web address | Dpt:{" "}
+            <Link simple color="primary" href={"http://www.fme.aegean.gr/"}>
+              <a>http://www.fme.aegean.gr/</a>
+            </Link>
+          </div>
+          <div>
+            Web address | i4m Lab:{" "}
+            <a href="http://www.atlantis-group.gr/i4Mlab">
+              http://www.atlantis-group.gr/i4Mlab
             </a>
-          </Link>
           </div>
-          <div>
-            Web address | i4m Lab: <a href="http://www.atlantis-group.gr/i4Mlab">http://www.atlantis-group.gr/i4Mlab</a>
-          </div>
-          <div>
-            e-mail: i4mlab-courses@aegean.gr
-          </div>
-          <div>
-            Service developed by UAegean | i4m Lab © 2021
-          </div>
+          <div>e-mail: i4mlab-courses@aegean.gr</div>
+          <div>Service developed by UAegean | i4m Lab © 2021</div>
         </div>
       </div>
     </footer>

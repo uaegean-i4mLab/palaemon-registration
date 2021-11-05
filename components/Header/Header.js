@@ -64,8 +64,8 @@ export default function Header(props) {
   });
   const brandComponent = (
     <Link href="/components" as="/components">
-      <img className={classes.resizeImg}
-          src="https://myria.math.aegean.gr/~atsol/newpage/software/aegeanlogo/svg/bold-logo_sfiga_uof_aegean_en-rv.svg"
+      <img className={classes.resizeImg} style={{maxHeight:"7rem"}}
+          src="/img/GRIDS_logo_v04_White.svg"
           alt="..."
       />
     </Link>

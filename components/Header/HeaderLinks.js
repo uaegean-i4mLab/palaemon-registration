@@ -52,12 +52,12 @@ export default function HeaderLinks(props) {
       </ListItem>*/}
       <ListItem className={classes.listItem}>
         <Button
-            href="https://project-seal.eu/about"
+            href="https://www.grids-cef.eu/"
           color="transparent"
           target="_blank"
           className={classes.navLink}
         >
-          <Icon className={classes.Apps}>apps</Icon> Seal
+          <Icon className={classes.Apps}>apps</Icon> grids
         </Button>
       </ListItem>
       {/*<ListItem className={classes.listItem}>
@@ -89,40 +89,6 @@ export default function HeaderLinks(props) {
             className={classes.navLink}
           >
             <i className={classes.socialIcons + " fab fa-twitter"} />
-          </Button>
-        </Tooltip>
-      </ListItem>
-      <ListItem className={classes.listItem}>
-        <Tooltip
-          id="instagram-facebook"
-          title="Follow us on facebook"
-          placement={"top"}
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            color="transparent"
-            href="https://www.facebook.com/CreativeTim?ref=creativetim"
-            target="_blank"
-            className={classes.navLink}
-          >
-            <i className={classes.socialIcons + " fab fa-facebook"} />
-          </Button>
-        </Tooltip>
-      </ListItem>
-      <ListItem className={classes.listItem}>
-        <Tooltip
-          id="instagram-tooltip"
-          title="Follow us on instagram"
-          placement={"top"}
-          classes={{ tooltip: classes.tooltip }}
-        >
-          <Button
-            color="transparent"
-            href="https://www.instagram.com/CreativeTimOfficial?ref=creativetim"
-            target="_blank"
-            className={classes.navLink}
-          >
-            <i className={classes.socialIcons + " fab fa-instagram"} />
           </Button>
         </Tooltip>
       </ListItem>
