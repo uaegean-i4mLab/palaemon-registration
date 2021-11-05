@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { useState } from 'react';
-import Layout from '../components/layout'
+import Layout from '../components/Layout'
 import utilStyles from '../styles/utils.module.css';
 import GridContainer from "../components/Grid/GridContainer";
 import GridItem from "../components/Grid/GridItem";

@@ -175,21 +175,21 @@ app.prepare().then(async () => {
     await sendEmailVCInvite(req,res);
   });
 
-  //seal
-  server.post(["/seal/start-session"], async (req, res) => {
-    console.log("/seal/start-session");
-    await startSession(app, req, res, serverConfiguration.endpoint);
-  });
-  server.get(["/seal/make-eidas-token"], async (req, res) => {
-    console.log("/seal/make-eidas-token");
-    res.send(
-      await makeEidasRedirectionToken(req, res, serverConfiguration.endpoint)
-    );
-  });
-  server.post(["/seal/update-session"], async (req, res) => {
-    console.log("/seal/update-session ");
-    res.send(await updateSession(req, res, serverConfiguration.endpoint));
-  });
+  // //seal
+  // server.post(["/seal/start-session"], async (req, res) => {
+  //   console.log("/seal/start-session");
+  //   await startSession(app, req, res, serverConfiguration.endpoint);
+  // });
+  // server.get(["/seal/make-eidas-token"], async (req, res) => {
+  //   console.log("/seal/make-eidas-token");
+  //   res.send(
+  //     await makeEidasRedirectionToken(req, res, serverConfiguration.endpoint)
+  //   );
+  // });
+  // server.post(["/seal/update-session"], async (req, res) => {
+  //   console.log("/seal/update-session ");
+  //   res.send(await updateSession(req, res, serverConfiguration.endpoint));
+  // });
 
   // session
   server.post(["/start-session"], async (req, res) => {

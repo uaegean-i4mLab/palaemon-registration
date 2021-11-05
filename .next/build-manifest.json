@@ -28,6 +28,11 @@
       "static/chunks/main.js",
       "static/chunks/webpack.js",
       "static/chunks/pages/kyb/company-selection.js"
+    ],
+    "/kyb/validate-relation": [
+      "static/chunks/main.js",
+      "static/chunks/webpack.js",
+      "static/chunks/pages/kyb/validate-relation.js"
     ]
   },
   "ampFirstPages": []

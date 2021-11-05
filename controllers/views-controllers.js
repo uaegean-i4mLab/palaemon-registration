@@ -1,4 +1,4 @@
-import { getSealSessionData, validateToken } from "../services/sealService";
+// import { getSealSessionData, validateToken } from "../services/sealService";
 import { endpoints } from "../config/seal_endpoints";
 import { parseSealAttributeSet } from "../utils/dataStoreHelper";
 import { defaultClaims } from "../config/defaultOidcClaims";
@@ -51,6 +51,7 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
   let companyName = req.body.companyName;
   let legalPersonIdentifier = req.body.legal_person_identifier;
   let email = req.body.email;
+  let country = req.body.country
 
   let claims = defaultClaims;
   let sessionId = req.cookies.sessionId;
@@ -61,8 +62,12 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
   );
   await setOrUpdateSessionData(sessionId, "companyName", companyName);
   await setOrUpdateSessionData(sessionId, "email", email);
-  // await setOrUpdateSessionData(sessionId, "companyCountry", companyCountry);
+  await setOrUpdateSessionData(sessionId, "companyCountry", country);
 
+  
+  claims.userinfo.verified_claims.verification.evidence[0].registry.country.value=country 
+  console.log("!!!!!!!!!!! the claims that will be added!!!!!!!")
+  console.log(claims.userinfo.verified_claims.verification.evidence[0])
   if (companyName || legalPersonIdentifier) {
     const headerRaw = {
       alg: "none",
@@ -145,7 +150,10 @@ const registryPrompt = async (app, req, res, endpoint) => {
   req.sessionId = sessionId;
   // req.extSessionId = req.cookies.extSessionId;
   req.keycloakRedirectURI = process.env.KEYCLOAK_REDIRECT_URI
-    ? `${process.env.KEYCLOAK_REDIRECT_URI}?extSessionId=${req.cookies.extSessionId}`
+    ? `${process.env.KEYCLOAK_REDIRECT_URI}?extSessionId=${
+        req.cookies.extSessionId
+      }
+    &userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`
     : `http://localhost:8081/auth/realms/kyb/rest/kybResponse?extSessionId=${
         req.cookies.extSessionId
       }&userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`;
@@ -187,9 +195,15 @@ const issueKYB = async (app, req, res, serverPassport, oidcClient) => {
   // return app.render(req, res, "/vc/issue/kyb", req.query);
 };
 
-
-const issueVcKYBResponse = async (app, req, res, endpoint, serverPassport, oidcClient) => {
-  let sessionId = req.query.sessionId
+const issueVcKYBResponse = async (
+  app,
+  req,
+  res,
+  endpoint,
+  serverPassport,
+  oidcClient
+) => {
+  let sessionId = req.query.sessionId;
   let userDetails = await getSessionData(sessionId, "userDetails");
   // console.log(updatedUsersAttributes);
   req.session.DID = false;
@@ -198,8 +212,7 @@ const issueVcKYBResponse = async (app, req, res, endpoint, serverPassport, oidcC
   req.session.endpoint = endpoint;
   req.session.baseUrl = process.env.BASE_PATH;
   return app.render(req, res, "/vc/issue/kyb", req.query);
-
-}
+};
 
 const issueEidas = async (app, req, res, endpoint) => {
   //if we are redirected from mobile
@@ -310,5 +323,5 @@ export {
   validateRelationship,
   registryPrompt,
   issueKYB,
-  issueVcKYBResponse
+  issueVcKYBResponse,
 };
