@@ -8,6 +8,7 @@ import Button from "components/CustomButtons/Button.js";
 import CustomInputNew from "components/CustomInput/CustomInputNew.js";
 
 import styles from "styles/jss/nextjs-material-kit/components/formStyle.js";
+import MessageBox from "../messageBox";
 
 const useStyles = makeStyles(styles);
 
@@ -20,9 +21,11 @@ export default function Form6(props) {
     
       <div className={classes.container}>
         <h6 className={classes.headTitle}>
-          In order to build your KYB profile, first provide your company’s
-          details below, and then click the “Retrieve Data” button. This will
-          result in an eIDAS eID authentication.
+            Build your KYB profile
+            <MessageBox message={'In order to build your KYB profile, first provide your company’s\n' +
+            '          details below, and then click the “Retrieve Data” button. This will\n' +
+            '          result in an eIDAS eID authentication.'}/>
+
         </h6>
 
         <h4 className={classes.customH4}>Company Details Form</h4>

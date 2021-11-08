@@ -1,20 +1,16 @@
-/*
-import Link from "next/link";
 import React , { useState } from "react";
-import { Button } from "react-bootstrap";
-import isMobile from "../utils/isMobile";
+import SimpleButton from "@material-ui/core/Button";
 
-function messageBox(props) {
+export default function MessageBox(props) {
     const [showText, setShowText] = useState(false);
 
     return (
         <div style={{ marginTop: "1.5rem" }}>
                 <React.Fragment>
-                    <button onClick={() => setShowText(!showText)}>Toggle</button>
+                    <SimpleButton onClick={() => setShowText(!showText)}>More Info</SimpleButton>
                     {showText && <div>{props.message}</div>}
                 </React.Fragment>
         </div>
     );
 };
 
-export default messageBox;*/

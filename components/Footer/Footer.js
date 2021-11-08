@@ -30,62 +30,29 @@ export default function Footer(props) {
   });
   return (
     <footer className={footerClasses}>
-      <div className={classes.container}>
+      <div className={classes.footerContainer}>
         <div className={classes.left}>
-          <div className="lfImgAndText">
-            <div className="lfImgAndText--text">
+          <div className={classes.lfImgAndTextWr}>
+            <img style={{maxHeight:"7rem"}}
+                 src="/cef-logo.png"
+                 alt="..."
+            />
+            <div className={classes.lfImgAndText}>
               <div>
                 <b>Co-financed by the European Union</b>
-                <hr className="hrFtr" />
+                <hr className={classes.hrFtr} />
               </div>
               <div>Connecting Europe Facility</div>
             </div>
           </div>
-          <div className="btmText">
+          <div className={classes.btmText}>
             <p>
               Grant Agreement under the Connection Europe Facility (CEF) <br/>
               Telecommunications Sector <br />
               Agreement number INEA/CEF/ICT/A2019/1926018
             </p>
           </div>
-          {/*<List className={classes.list}>
-            <ListItem className={classes.inlineBlock}>
-              <a
-                href="https://www.creative-tim.com/?ref=njsmk-footer"
-                className={classes.block}
-                target="_blank"
-              >
-                Creative Tim
-              </a>
-            </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a
-                href="https://www.creative-tim.com/presentation?ref=njsmk-footer"
-                className={classes.block}
-                target="_blank"
-              >
-                About us
-              </a>
-            </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a
-                href="http://blog.creative-tim.com/?ref=njsmk-footer"
-                className={classes.block}
-                target="_blank"
-              >
-                Blog
-              </a>
-            </ListItem>
-            <ListItem className={classes.inlineBlock}>
-              <a
-                href="https://www.creative-tim.com/license?ref=njsmk-footer"
-                className={classes.block}
-                target="_blank"
-              >
-                Licenses
-              </a>
-            </ListItem>
-          </List>*/}
+
         </div>
         <div className={classes.right}>
           <div>

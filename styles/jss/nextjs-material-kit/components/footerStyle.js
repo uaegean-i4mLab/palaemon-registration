@@ -24,6 +24,12 @@ const footerStyle = {
     padding: "15px 0",
     margin: "0",
     float: "right!important",
+    "@media (min-width: 992px)": {
+      maxWidth: "500px",
+    },
+    "@media (min-width: 1200px)": {
+      maxWidth: "700px",
+    },
     a: {
 
         color: primaryColor,
@@ -39,7 +45,7 @@ const footerStyle = {
     zIndex: "2",
     position: "static",
     borderTop: "4px solid #046ec5",
-    backgroundColor: "#eeeeee"
+    backgroundColor: "#eeeeee",
   },
   /*a: {
     color: primaryColor,
@@ -69,5 +75,42 @@ const footerStyle = {
     position: "relative",
     top: "3px",
   },
+  hrFtr: {
+    marginTop: "0px",
+    marginBottom: "0px",
+    height: "1px",
+    border: "none",
+    backgroundColor: "lightgrey"
+  },
+  btmText: {
+    fontSize: "12pt",
+    marginLeft:"0.5rem",
+    marginRight: "0.5rem",
+    color:"#20124d",
+    fontFamily: "Roboto",
+    fontWeight: "300",
+    verticalAlign: "baseline"
+  },
+  lfImgAndTextWr: {
+    display:"flex",
+    flexWrap: "wrap",
+  },
+
+  lfImgAndText: {
+    fontSize: "medium",
+    marginLeft: "1.5rem",
+    color:" black",
+    fontWeight: "400",
+    "@media (max-width: 444px)": {
+      marginLeft: "0px",
+    },
+  },
+  footerContainer: {
+    ...container,
+    display: "flex",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+  }
+
 };
 export default footerStyle;
