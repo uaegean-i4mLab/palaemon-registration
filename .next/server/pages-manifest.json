@@ -2,6 +2,6 @@
   "/_app": "pages/_app.js",
   "/_document": "pages/_document.js",
   "/_error": "pages/_error.js",
-  "/kyb/validate-relation": "pages/kyb/validate-relation.js",
-  "/kyb/company-selection": "pages/kyb/company-selection.js"
+  "/kyb/company-selection": "pages/kyb/company-selection.js",
+  "/kyb/validate-relation": "pages/kyb/validate-relation.js"
 }

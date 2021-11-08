@@ -1,8 +1,9 @@
 import React from "react";
 import axios from "axios";
-import Layout from "../../components/Layout";
+import LayoutNew from "../../components/LayoutNew";
 import { connect } from "react-redux";
 import ValidateTable from "../../components/ValidateKYBComp";
+import Head from "next/head";
 
 class Wizard extends React.Component {
   constructor(props) {
@@ -28,16 +29,25 @@ class Wizard extends React.Component {
   addUserToRegistry() {
     let sessionId = this.props.sessionId;
     const reqObj = { sessionId: sessionId };
-    axios.post("/registry/add", reqObj).then((response) => {
-      // console.log(response);
-      this.setState({
-        addedToRegistry: true,
-      });
-    }).then( () =>{
-      axios.post("/email/send", {sessionId: sessionId, issueLink:"thisisalink"}).then((response) => {
+    axios
+      .post("/registry/add", reqObj)
+      .then((response) => {
         // console.log(response);
-        console.log("email sent ok")
-    })});
+        this.setState({
+          addedToRegistry: true,
+        });
+      })
+      .then(() => {
+        axios
+          .post("/email/send", {
+            sessionId: sessionId,
+            issueLink: "thisisalink",
+          })
+          .then((response) => {
+            // console.log(response);
+            console.log("email sent ok");
+          });
+      });
     //TODO add here the send email callback
   }
 
@@ -58,31 +68,43 @@ class Wizard extends React.Component {
     );
 
     return (
-      <div className="container" style={{ marginTop: "3rem" }}>
-        {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          Please review the attributes retrieved, presented below. If you are
-          certain that these attributes correctly identify you please click the
-          Next button. Additionally, if you would like you can  add your Company’s KYB
-          profile in the public registry in an easily Verifiable Format? If you
-          opt in for this feature the public profile of your organization will
-          be easily verified by anyone (public authorities, B2B transactions
-          etc.) greatly facilitating your dealings with these parties. If Yes,
-          please click the “Register” button
-        </div>
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          Details:
-        </div>
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          <ValidateTable userDetails={this.props.userDetails}></ValidateTable>
+      <LayoutNew home>
+        <Head>
+          <title>Grids</title>
+        </Head>
+
+
+
+        <div className="container" style={{ marginTop: "3rem" }}>
+          {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
+          <div className="row" style={{ marginBottom: "3rem" }}>
+            Please review the attributes retrieved, presented below. If you are
+            certain that these attributes correctly identify you please click
+            the Next button. Additionally, if you would like you can add your
+            Company’s KYB profile in the public registry in an easily Verifiable
+            Format? If you opt in for this feature the public profile of your
+            organization will be easily verified by anyone (public authorities,
+            B2B transactions etc.) greatly facilitating your dealings with these
+            parties. If Yes, please click the “Register” button
+          </div>
+          <div className="row" style={{ marginBottom: "3rem" }}>
+            Details:
+          </div>
+          <div className="row" style={{ marginBottom: "3rem" }}>
+            <ValidateTable userDetails={this.props.userDetails}></ValidateTable>
+          </div>
+
+          {addToRegistryDiv}
+
+          <div className="row" style={{ marginBottom: "3rem" }}>
+            <button onClick={this.proceedToKeycloak}>Finish</button>
+          </div>
         </div>
 
-        {addToRegistryDiv}
 
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          <button onClick={this.proceedToKeycloak}>Finish</button>
-        </div>
-      </div>
+
+        
+      </LayoutNew>
     );
   }
 }

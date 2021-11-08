@@ -1,10 +1,8 @@
 import React from "react";
-import axios from "axios";
-import Layout from "../../components/Layout";
+import ValidateRelationArea from "../../components/InfoArea/ValidateRelationArea";
 import { connect } from "react-redux";
-import { useHistory } from "react-router-dom";
 
-class Wizard extends React.Component {
+class ValidateRelation extends React.Component {
   constructor(props) {
     super(props);
     this.signAndProceed = this.signAndProceed.bind(this);
@@ -33,8 +31,8 @@ class Wizard extends React.Component {
     // history.push("/kyb/registry-prompt");
   };
 
-  showDocument =(e) => {
-    console.log("showdocument")
+  showDocument = (e) => {
+    console.log("showdocument");
     e.preventDefault();
     this.setState({
       displayDocument: true,
@@ -42,51 +40,16 @@ class Wizard extends React.Component {
   };
 
   render() {
-    let documentDisplayDiv = !this.state.displayDocument ? (
-      <div></div>
-    ) : (
-      <div id="document">
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          Document:
-        </div>
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>I</span>
-          <b>
-            {this.props.userDetails.given_name}{" "}
-            {this.props.userDetails.family_name}
-          </b>
-          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>, born at:</span>{" "}
-          <b>{this.props.userDetails.birthdate}</b>
-          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>
-            identified by the eIDAS personal Identifier:
-          </span>
-          <b>{this.props.userDetails.personal_number}</b>
-          <span style={{ padding: "0rem 0.3rem 0rem 0.3rem" }}>
-            {" "}
-            attest that I am affiliated with the company identified by the Legal
-            Company Identifier or Legal Name:
-          </span>
-          <b>{this.props.companyIdentifier}</b>.
-        </div>
-      </div>
-    );
-
     return (
-      <div className="container" style={{ marginTop: "3rem" }}>
-        {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          Please validate your relationship with the declared company. To do so,
-          click the Sign button. This will result in the signing a qualified One
-          Time Signature (issued using your eIDAS eID profile) a document
-          validating your relationship with the declared document. To review the
-          document please click <a href="#" onClick={this.showDocument}>here</a>
-        </div>
-        {documentDisplayDiv}
-
-        <div className="row" style={{ marginBottom: "3rem" }}>
-          <button onClick={this.signAndProceed}>Sign</button>
-        </div>
-      </div>
+      <ValidateRelationArea
+        showDocument={this.showDocument}
+        signAndProceed={this.signAndProceed}
+        displayDocument={this.state.displayDocument}
+        userDetails={this.props.userDetails}
+        companyIdentifier={this.props.companyIdentifier}
+        companyName={this.props.companyName}
+        legalPersonIdentifier={this.props.legalPersonIdentifier}
+      />
     );
   }
 }
@@ -100,4 +63,4 @@ function mapStateToProps(state) {
 const mapDispatchToProps = (dispatch) => {
   return {};
 };
-export default connect(mapStateToProps, mapDispatchToProps)(Wizard);
+export default connect(mapStateToProps, mapDispatchToProps)(ValidateRelation);

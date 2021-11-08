@@ -150,13 +150,8 @@ const registryPrompt = async (app, req, res, endpoint) => {
   req.sessionId = sessionId;
   // req.extSessionId = req.cookies.extSessionId;
   req.keycloakRedirectURI = process.env.KEYCLOAK_REDIRECT_URI
-    ? `${process.env.KEYCLOAK_REDIRECT_URI}?extSessionId=${
-        req.cookies.extSessionId
-      }
-    &userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`
-    : `http://localhost:8081/auth/realms/kyb/rest/kybResponse?extSessionId=${
-        req.cookies.extSessionId
-      }&userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`;
+    ? `${process.env.KEYCLOAK_REDIRECT_URI}?extSessionId=${req.cookies.extSessionId}&userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`
+    : `http://localhost:8081/auth/realms/kyb/rest/kybResponse?extSessionId=${req.cookies.extSessionId}&userDetails=${encodeURIComponent(JSON.stringify(userDetails))}`;
   return app.render(req, res, "/kyb/registry-prompt", req.query);
 };
 
