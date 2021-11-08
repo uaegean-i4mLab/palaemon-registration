@@ -66,8 +66,8 @@ const startLogin = async (app, req, res, serverPassport, oidcClient) => {
 
   
   claims.userinfo.verified_claims.verification.evidence[0].registry.country.value=country 
-  console.log("!!!!!!!!!!! the claims that will be added!!!!!!!")
-  console.log(claims.userinfo.verified_claims.verification.evidence[0])
+  // console.log("!!!!!!!!!!! the claims that will be added!!!!!!!")
+  // console.log(claims.userinfo.verified_claims.verification.evidence[0])
   if (companyName || legalPersonIdentifier) {
     const headerRaw = {
       alg: "none",
@@ -119,6 +119,9 @@ const validateRelationship = async (app, req, res, endpoint) => {
   req.companyName = companyName;
   req.legalPersonIdentifier = legalPersonIdentifier;
   req.sessionId = sessionId;
+  if(userDetails.error){
+    req.error = userDetails.error
+  }
   // console.log(userDetails)
   /*
   {

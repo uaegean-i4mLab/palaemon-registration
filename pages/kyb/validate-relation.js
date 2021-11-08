@@ -23,6 +23,7 @@ class ValidateRelation extends React.Component {
       legalPersonIdentifier: req.legalPersonIdentifier,
       companyName: req.companyName,
       companyIdentifier: companyIdentifier,
+      error: req.error
     };
   }
 
@@ -49,6 +50,7 @@ class ValidateRelation extends React.Component {
         companyIdentifier={this.props.companyIdentifier}
         companyName={this.props.companyName}
         legalPersonIdentifier={this.props.legalPersonIdentifier}
+        error={this.props.error}
       />
     );
   }

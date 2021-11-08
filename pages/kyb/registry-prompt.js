@@ -4,6 +4,7 @@ import LayoutNew from "../../components/LayoutNew";
 import { connect } from "react-redux";
 import ValidateTable from "../../components/ValidateKYBComp";
 import Head from "next/head";
+import RegistryPromptAreaComp from  "../../components/InfoArea/RegistryPromptArea"
 
 class Wizard extends React.Component {
   constructor(props) {
@@ -73,10 +74,8 @@ class Wizard extends React.Component {
           <title>Grids</title>
         </Head>
 
-
-
-        <div className="container" style={{ marginTop: "3rem" }}>
-          {/* <ValidateTable userDetails={this.props.userDetails}></ValidateTable> */}
+        {/* <div className="container" style={{ marginTop: "3rem" }}>
+          
           <div className="row" style={{ marginBottom: "3rem" }}>
             Please review the attributes retrieved, presented below. If you are
             certain that these attributes correctly identify you please click
@@ -99,11 +98,12 @@ class Wizard extends React.Component {
           <div className="row" style={{ marginBottom: "3rem" }}>
             <button onClick={this.proceedToKeycloak}>Finish</button>
           </div>
-        </div>
+        </div> */}
 
-
-
-        
+        <RegistryPromptAreaComp userDetails={this.props.userDetails} 
+        proceedToKeycloak={this.proceedToKeycloak}
+        addToRegistryDiv={this.state.addedToRegistry}
+        addUserToRegistry={this.addUserToRegistry}/>
       </LayoutNew>
     );
   }

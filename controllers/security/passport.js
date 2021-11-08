@@ -14,7 +14,7 @@ const repo = require("../../repository/kybRepo");
 const { JWK, JWE } = require("node-jose");
 import { defaultClaims } from "../../config/defaultOidcClaims";
 import { getSessionData, setOrUpdateSessionData } from "../../services/redis";
-import {getUserByeIDASIdenitifier} from "../../repository/kybRepo"
+import { getUserByeIDASIdenitifier } from "../../repository/kybRepo";
 
 // Part 3, create a JWKS
 const keyStore = jose.JWK.createKeyStore();
@@ -175,27 +175,34 @@ const getConfiguredPassport = async (
       // console.log("*************")
       let sessionId = req.cookies.sessionId;
       // console.log(`sessionId: ${sessionId}`)
+      console.log("PASSPORT.JS REQ.USEr")
+      console.log(req.user)
+
       setOrUpdateSessionData(sessionId, "userDetails", req.user);
       let redirect_uri =
         req.cookies.kyb === "false"
           ? "/validate-relation"
           : `/vc/issue/kybResponse?sessionId=${req.cookies.kyb}`;
 
-      if( req.cookies.kyb !== "false"){
+      if (req.cookies.kyb !== "false") {
         let personalIdentifier = req.user.personal_number;
-        console.log("passport.js passport.authenticate :: user with eIDAS " + personalIdentifier)
+        console.log(
+          "passport.js passport.authenticate :: user with eIDAS " +
+            personalIdentifier
+        );
         //TODO call the registry for user data
         //if not found then error
-        let userFound = await getUserByeIDASIdenitifier(personalIdentifier)
-        if(!userFound){
-          redirect_uri= "/userNotFound"
-        }else{
-          console.log(`founda mathcing user in the public registry for ${personalIdentifier}`)
+        let userFound = await getUserByeIDASIdenitifier(personalIdentifier);
+        if (!userFound) {
+          redirect_uri = "/userNotFound";
+        } else {
+          console.log(
+            `founda mathcing user in the public registry for ${personalIdentifier}`
+          );
         }
       }
-      
-      
-       console.log(`will redirect to ${redirect_uri}`);
+
+      console.log(`will redirect to ${redirect_uri}`);
       res.redirect(redirect_uri);
     }
   );
@@ -228,12 +235,17 @@ function getDataFromDPs(_user_info_request, _user_info_port, accessToken) {
         console.log("******* USER INFO END **********************");
         //TODO consolidate many sources!!
         if (resJson._claim_sources.src1) {
-          resolve(
-            await sendToken(
+          try {
+            let claimsFromDPs = await sendToken(
               resJson._claim_sources.src1.access_token,
               resJson._claim_sources.src1.endpoint
-            )
-          );
+            );
+            resolve(claimsFromDPs);
+          } catch (err) {
+            console.log("error in try of getDataFromDPs")
+            console.log(err)
+            reject(err);
+          }
         } else {
           reject({ error: "no claim sources found in response" });
         }
@@ -274,24 +286,38 @@ async function sendToken(accessToken, endpoint) {
         const ks = fs.readFileSync("keys.json");
         jose.JWK.asKeyStore(ks.toString()).then(async (keyStore) => {
           //decrypt received data
-          console.log("===========>Response from DP::")
-            console.log(payload)
-          console.log("===========><==================")
-          const decrypted = await JWE.createDecrypt(keyStore).decrypt(payload);
-          const body = Buffer.from(decrypted.plaintext);
-          const resJson = JSON.parse(body.toString());
-          console.log("******* DECRYPTED DP RESPONSE**************");
-          resJson.verified_claims.verified_claims.forEach((element) => {
-            console.log("verified claim found");
-            console.log(element);
-            console.log(element.verification.evidence);
-          });
-          // console.log(resJson.verified_claims.verified_claims)
-          console.log("********************************************");
-          // add decrypted data to database
-          //
-          // repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
-          resolve(resJson.verified_claims.verified_claims[0].claims);
+          console.log("===========>Response from DP::");
+          console.log(payload);
+          let errorPayload ={}
+          try{
+            errorPayload = JSON.parse(payload)
+          }catch(error){
+            console.log("passport.js no error payload found! This is good")
+          }
+          if (errorPayload.error) {
+            console.log("will reject with error")
+            console.log("will reject with error")
+            reject(errorPayload.error);
+          } else {
+            console.log("===========><==================");
+            const decrypted = await JWE.createDecrypt(keyStore).decrypt(
+              payload
+            );
+            const body = Buffer.from(decrypted.plaintext);
+            const resJson = JSON.parse(body.toString());
+            console.log("******* DECRYPTED DP RESPONSE**************");
+            resJson.verified_claims.verified_claims.forEach((element) => {
+              console.log("verified claim found");
+              console.log(element);
+              console.log(element.verification.evidence);
+            });
+            // console.log(resJson.verified_claims.verified_claims)
+            console.log("********************************************");
+            // add decrypted data to database
+            //
+            // repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
+            resolve(resJson.verified_claims.verified_claims[0].claims);
+          }
         });
       });
     });
@@ -357,7 +383,7 @@ const addClaimsToStrategy = (
         return cb(null, { ...userData, ...profile.verified_claims.claims });
       } catch (err) {
         console.log(err);
-        return cb(null, { profile });
+        return cb(null, { error: err });
       }
     }
   );
