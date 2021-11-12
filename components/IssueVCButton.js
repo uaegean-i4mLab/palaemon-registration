@@ -3,6 +3,7 @@ import React from "react";
 import { connect } from "react-redux";
 import { requestVC } from "../store";
 import isMobile from "../utils/isMobile";
+import IssueVCButtonUI from "../components/CustomButtons/IssueVCButton"
 
 class IssueVCButton extends React.Component {
   constructor(props) {
@@ -31,13 +32,13 @@ class IssueVCButton extends React.Component {
 
   render() {
     return (
-      <Button
+      <IssueVCButtonUI
         variant="primary"
         disabled={!this.props.hasRequiredAttributes}
         onClick={this.click}
-      >
-        Issue 
-      </Button>
+        color="primary" size="lg" 
+      />
+       
       // </Link>
     );
   }

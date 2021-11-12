@@ -23,15 +23,21 @@ class SSE extends React.Component {
         console.log(eventData);
 
         if (eventData.sessionId && this.props.serverSessionId) {
-          console.log(
-            `SSE.js -- componentDidMount:: got ${eventData.sessionId} and the current session id is ${this.props.serverSessionId}`
-          );
+          // console.log(
+          //   `SSE.js -- componentDidMount:: got ${eventData.sessionId} and the current session id is ${this.props.serverSessionId}`
+          // );
           if (eventData.sessionId === this.props.serverSessionId) {
             console.log(`SSE.js -- componentDidMount:: sessionsMatch!!`);
             console.log(
               `SSE.js -- componentDidMount:: uuid: ${eventData.uuid}`
             );
-            this.props.didAuthOK(eventData.uuid, this.props.sealSession);
+            if(eventData.status ==="connected"){
+              this.props.didAuthOK(eventData.uuid, this.props.sealSession);
+
+            }
+            if(eventData.status==="sent"){
+              this.props.vcSentOK(eventData.uuid, this.props.sealSession);
+            }
           }
         }
 
@@ -86,6 +92,9 @@ const mapDispatchToProps = dispatch => {
     },
     didAuthOK: (uuid, sealSession) => {
       dispatch(completeDIDAuth(uuid, sealSession));
+    },
+    vcSentOK: (uuid,sealSession) =>{
+      dispatch(vcSentToUser(uuid,sealSession))
     }
   };
 };

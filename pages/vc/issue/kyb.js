@@ -23,6 +23,9 @@ import IssueVCButton from "../../../components/IssueVCButton";
 import PairOrCard from "../../../components/PairOrCard";
 import ConnectMobile from "../../../components/ConnectMobile";
 import isMobile from "../../../utils/isMobile";
+import Head from "next/head";
+import LayoutNew from "../../../components/LayoutNewFull";
+import ProceedIssuePrompt from "../../../components/ProceedIssuePrompt";
 
 class IssueKYB extends React.Component {
   constructor(props) {
@@ -31,8 +34,7 @@ class IssueKYB extends React.Component {
     this.isFetching = props.isFetching;
     this.sessionData = props.sessionData;
     this.hasRequiredAttributes =
-      props.sessionData !== null &&
-      props.sessionData !== undefined ;
+      props.sessionData !== null && props.sessionData !== undefined;
   }
 
   static async getInitialProps({ reduxStore, req }) {
@@ -90,27 +92,6 @@ class IssueKYB extends React.Component {
     }
   }
 
-  componentDidUpdate() {
-    if (this.props.DID & !this.hasRequiredAttributes) {
-      // //if DID auth is completed
-      // // register the callbackUri to the SessionManager
-      // let postUrl = this.props.baseUrl
-      //   ? `${this.props.baseUrl}seal/update-session`
-      //   : "/seal/update-session";
-      // axios
-      //   .post(postUrl, {
-      //     sessionId: this.props.sealSession,
-      //     variableName: "ClientCallbackAddr",
-      //     variableValue: this.props.eidasRedirectUri,
-      //   })
-      //   .then((data) => {
-      //     console.log("eidas.js:: session updated");
-      //   });
-    }
-  }
-
-
-
   render() {
     let stepNumber = this.props.vcSent
       ? 2
@@ -125,62 +106,62 @@ class IssueKYB extends React.Component {
       { title: "Accept Request on your Mobile Wallet" },
     ];
 
-    if (this.props.qrData && isMobile() && !this.props.DID) {
-      return (
-        <div>
-          <Row>
-            <Col>
-              <MyStepper steps={stepperSteps} activeNum={stepNumber} />
-            </Col>
-          </Row>
-          <ConnectMobile
-            baseUrl={this.props.baseUrl}
-            qrData={this.props.qrData}
-            DID={this.props.DID}
-            uuid={this.props.uuid}
-            serverSessionId={this.props.serverSessionId}
-            sealSession={this.props.sessionId}
-          />
-        </div>
-      );
-    }
+    // if (this.props.qrData && isMobile() && !this.props.DID) {
+    //   return (
+    //     <div>
+    //       <Row>
+    //         <Col>
+    //           <MyStepper steps={stepperSteps} activeNum={stepNumber} />
+    //         </Col>
+    //       </Row>
+    //       <ConnectMobile
+    //         baseUrl={this.props.baseUrl}
+    //         qrData={this.props.qrData}
+    //         DID={this.props.DID}
+    //         uuid={this.props.uuid}
+    //         serverSessionId={this.props.serverSessionId}
+    //         sealSession={this.props.sessionId}
+    //       />
+    //     </div>
+    //   );
+    // }
 
-   
     let issueVCBut = (
       <IssueVCButton
         hasRequiredAttributes={this.hasRequiredAttributes}
-        // vcIssuanceEndpoint={"/issueVCSecure"}
         baseUrl={this.props.baseUrl}
-        // user attributes are not required as they are already in the backend
-        // only the type of the VC should be provided here
-        // vcAttributes={this.props.userSelection}
         uuid={this.props.sessionId}
         vcType={vcTypes.kyb}
       />
     );
 
+    // let promptCard = (
+    //   <Card className="text-center" style={{ marginTop: "2rem" }}>
+    //     <Card.Header>
+    //       Generate a Portable KYB Profile using Verifiable Credentials
+    //     </Card.Header>
+    //     <Card.Body>
+    //       <Card.Text>
+    //         Click the following button to generate your KYB Profile Verifiable
+    //         Credential. Next, scan the generated QR code to receive the VC on
+    //         your mobile wallet app.
+    //       </Card.Text>
+    //       <Container>
+    //         <Row>
+    //           <Col>{issueVCBut}</Col>
+    //         </Row>
+    //       </Container>
+    //     </Card.Body>
+    //   </Card>
+    // );
+
     let promptCard = (
-      <Card className="text-center" style={{ marginTop: "2rem" }}>
-        <Card.Header>Generate a Portable  KYB Profile using Verifiable Credentials</Card.Header>
-        <Card.Body>
-          {/* <Card.Title>
-            {this.hasRequiredAttributes
-              ? `Click the following button to generate your KYB Profile Verifiable Credential. 
-              Next, scan the generated QR code to receive the VC on your mobile wallet app. `
-              : "Please authenticate to the required data sources"}
-          </Card.Title> */}
-          <Card.Text>
-          Click the following button to generate your KYB Profile Verifiable Credential. 
-              Next, scan the generated QR code to receive the VC on your mobile wallet app.
-          </Card.Text>
-          <Container>
-            <Row>
-              <Col>{issueVCBut}</Col>
-            </Row>
-          </Container>
-        </Card.Body>
-        {/* <Card.Footer className="text-muted">2 days ago</Card.Footer> */}
-      </Card>
+      <ProceedIssuePrompt
+        hasRequiredAttributes={this.hasRequiredAttributes}
+        baseUrl={this.props.baseUrl}
+        uuid={this.props.sessionId}
+        vcType={vcTypes.kyb}
+      />
     );
 
     let result = (
@@ -198,16 +179,12 @@ class IssueKYB extends React.Component {
     );
 
     return (
-      <div className="container">
-        <Row>
-          <Col>
-            <MyStepper steps={stepperSteps} activeNum={stepNumber} />
-          </Col>
-        </Row>
+      <LayoutNew home>
+        <Head>
+          <title>Grids VC Issuer</title>
+        </Head>
         {result}
-
-       
-      </div>
+      </LayoutNew>
     );
   }
 }
@@ -243,14 +220,11 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(setEndpoint(endpoint));
     },
     makeConnectionRequest: (sessionId, baseUrl, vcType, isMobile) => {
-      dispatch(
-        makeOnlyConnectionRequest(sessionId, baseUrl, vcType, isMobile)
-      );
+      dispatch(makeOnlyConnectionRequest(sessionId, baseUrl, vcType, isMobile));
     },
     didAuthOK: (uuid) => {
       dispatch(completeDIDAuth(uuid));
     },
-
   };
 };
 
