@@ -35,7 +35,7 @@ const QrPrompt = (props) => {
               <Col>
                 <img
                   className="img-fluid"
-                  style={{ display: "block", margin: "auto" }}
+                  style={{ display: "block", margin: "auto", maxHeight:"21rem" }}
                   src={props.qrData}
                 />
               </Col>

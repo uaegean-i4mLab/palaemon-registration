@@ -175,10 +175,10 @@ const getConfiguredPassport = async (
       // console.log("*************")
       let sessionId = req.cookies.sessionId;
       // console.log(`sessionId: ${sessionId}`)
-      console.log("PASSPORT.JS REQ.USEr")
-      console.log(req.user)
+      // console.log("PASSPORT.JS REQ.USEr");
+      // console.log(req.user);
 
-      setOrUpdateSessionData(sessionId, "userDetails", req.user);
+      await setOrUpdateSessionData(sessionId, "userDetails", req.user);
       let redirect_uri =
         req.cookies.kyb === "false"
           ? "/validate-relation"
@@ -194,11 +194,13 @@ const getConfiguredPassport = async (
         //if not found then error
         let userFound = await getUserByeIDASIdenitifier(personalIdentifier);
         if (!userFound) {
+          console.log("no user found in mongo. This means that the user is not registerd so will display error")
           redirect_uri = "/userNotFound";
         } else {
           console.log(
-            `founda mathcing user in the public registry for ${personalIdentifier}`
+            `founda mathcing user in the public registry for ${personalIdentifier} will add to session ${sessionId}`
           );
+          setOrUpdateSessionData(sessionId,"kybProfile",userFound)
         }
       }
 
@@ -242,8 +244,8 @@ function getDataFromDPs(_user_info_request, _user_info_port, accessToken) {
             );
             resolve(claimsFromDPs);
           } catch (err) {
-            console.log("error in try of getDataFromDPs")
-            console.log(err)
+            console.log("error in try of getDataFromDPs");
+            console.log(err);
             reject(err);
           }
         } else {
@@ -286,37 +288,44 @@ async function sendToken(accessToken, endpoint) {
         const ks = fs.readFileSync("keys.json");
         jose.JWK.asKeyStore(ks.toString()).then(async (keyStore) => {
           //decrypt received data
-          console.log("===========>Response from DP::");
-          console.log(payload);
-          let errorPayload ={}
-          try{
-            errorPayload = JSON.parse(payload)
-          }catch(error){
-            console.log("passport.js no error payload found! This is good")
+          // console.log("===========>Response from DP::");
+          // console.log(payload);
+          let errorPayload = {};
+          try {
+            errorPayload = JSON.parse(payload);
+          } catch (error) {
+            console.log("passport.js no error payload found! This is good");
           }
-          if (errorPayload.error) {
-            console.log("will reject with error")
-            console.log("will reject with error")
-            reject(errorPayload.error);
-          } else {
-            console.log("===========><==================");
-            const decrypted = await JWE.createDecrypt(keyStore).decrypt(
-              payload
+          if (payload.length === 0) {
+            console.log(
+              "passport.js no payload was found, empty string returned"
             );
-            const body = Buffer.from(decrypted.plaintext);
-            const resJson = JSON.parse(body.toString());
-            console.log("******* DECRYPTED DP RESPONSE**************");
-            resJson.verified_claims.verified_claims.forEach((element) => {
-              console.log("verified claim found");
-              console.log(element);
-              console.log(element.verification.evidence);
-            });
-            // console.log(resJson.verified_claims.verified_claims)
-            console.log("********************************************");
-            // add decrypted data to database
-            //
-            // repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
-            resolve(resJson.verified_claims.verified_claims[0].claims);
+            resolve();
+          } else {
+            if (errorPayload.error) {
+              console.log("will reject with error");
+              console.log("will reject with error");
+              reject(errorPayload.error);
+            } else {
+              console.log("===========><==================");
+              const decrypted = await JWE.createDecrypt(keyStore).decrypt(
+                payload
+              );
+              const body = Buffer.from(decrypted.plaintext);
+              const resJson = JSON.parse(body.toString());
+              console.log("******* DECRYPTED DP RESPONSE**************");
+              resJson.verified_claims.verified_claims.forEach((element) => {
+                console.log("verified claim found");
+                console.log(element);
+                console.log(element.verification.evidence);
+              });
+              // console.log(resJson.verified_claims.verified_claims)
+              console.log("********************************************");
+              // add decrypted data to database
+              //
+              // repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
+              resolve(resJson.verified_claims.verified_claims[0].claims);
+            }
           }
         });
       });

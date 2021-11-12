@@ -1,9 +1,9 @@
-import { updateSessionData } from "./sealService";
 const qr = require("qr-image");
 const imageDataURI = require("image-data-uri");
 import { streamToBuffer } from "@jorgeferrero/stream-to-buffer";
 import { vcTypes } from "../config/vcTypes";
 import { AuthenticationProcessor } from "../utils/jolocomProcessors/authenticationProcessor";
+import { setOrUpdateSessionData } from "../services/redis";
 // import session from "express-session";
 const jsesc = require("jsesc");
 
@@ -74,7 +74,7 @@ const makeConnectionRequest = async (
   let mediaType = "PNG";
   let encodedQR = imageDataURI.encode(await streamToBuffer(code), mediaType);
   // store in the sessionManager the (sealSession,issuerSession)
-  let sessionUpdated = await updateSessionData(
+  let sessionUpdated = await setOrUpdateSessionData(
     sealSession,
     "issuerSession",
     sessionId
@@ -90,7 +90,10 @@ const connectionResponseServ = async (
 ) => {
   const userConnectionResponse = await issuerAgent.processJWT(jwtResponse);
   const did = userConnectionResponse.participants.responder.didDocument.did;
-  let sessionUpdated = await updateSessionData(sealSessionId, "DID", did);
+  console.log(
+    `jolocomService.js:: will cache the DID ${did} in the session ${sealSessionId}`
+  );
+  let sessionUpdated = await setOrUpdateSessionData(sealSessionId, "DID", did);
   let responseToken =
     await userConnectionResponse.createAuthenticationResponse();
   // console.log(responseToken.encode());
@@ -108,7 +111,7 @@ const makeCredentialOffer = async (
 ) => {
   // let did = await getSessionData(sealSession, "DID");
   //store the attributes of the user in session to get them from the call of the wallet
-  await updateSessionData(
+  await setOrUpdateSessionData(
     sealSession,
     "user",
     jsesc(userAttributes, {
@@ -120,22 +123,78 @@ const makeCredentialOffer = async (
     offeredCredentials: [
       {
         type: vcType,
+        renderInfo: {
+          renderAs: "document",
+        },
+        credential: {
+          name: vcType,
+          display: {
+            properties: [
+              { path: ["$.familyName"], label: "Family Name", value: "" },
+              {
+                path: ["$.given_name"],
+                label: "Given Name",
+                value: "",
+              },
+              { path: ["$.legal_name"], label: "Legal Name", value: "" },
+              {
+                path: ["$.legal_person_identifier"],
+                label: "Legal Person Identifier",
+                value: "",
+              },
+              {
+                path: ["$.business_role"],
+                label: "Business Role",
+                value: "",
+              },
+              {
+                path: ["$.address"],
+                label: "Address",
+                value: "",
+              },
+              {
+                path: ["$.lei"],
+                label: "L.E.I.",
+                value: "",
+              },
+              {
+                path: ["$.vat_registration"],
+                label: "Vat Registration Number.",
+                value: "",
+              },
+              {
+                path: ["$.birthdate"],
+                label: "Date of Birth",
+                value: "",
+              },
+              {
+                path: ["$.trading_status"],
+                label: "Trading Status",
+                value: "",
+              },
+              {
+                path: ["$.personal_number"],
+                label: "Personal Identifier",
+                value: "",
+              },
+              {
+                path: ["$.sub_jurisdiction"],
+                label: "Subjurisdiction",
+                value: "",
+              },
+            ],
+          },
+        },
       },
     ],
   };
-  if (vcType.indexOf("disposable") >= 0) {
-    console.log("issueVCJOLO---- offer is isEramsus ");
-    credentialOfferJSON.offeredCredentials.push({
-      type: "UAegean_Disposable_ID",
-    });
-  }
 
   let credentialOffer = await issuerAgent.credOfferToken(credentialOfferJSON);
   let code = qr.image(credentialOffer.encode(), {
     type: "png",
-    ec_level: "H",
-    size: 20,
-    margin: 10,
+    ec_level: "L",
+    size: 100,
+    margin: 0,
   });
   let mediaType = "PNG";
   let encodedQR = imageDataURI.encode(await streamToBuffer(code), mediaType);
@@ -161,58 +220,41 @@ const makeVC = async (
     ],
   };
   let claimValues = {};
-  if (
-    credType.indexOf(vcTypes.eidas) >= 0 ||
-    credType.indexOf(vcTypes.aegean) >= 0
-  ) {
-    simpleExampleCredMetadata.context[0].family_name = "schema:familyName";
-    simpleExampleCredMetadata.context[0].given_name = "schema:name";
-    simpleExampleCredMetadata.context[0].date_of_birth = "schema:brithDate";
-    simpleExampleCredMetadata.context[0].person_identifier = "schema:Person";
-    simpleExampleCredMetadata.context[0].loa = "schema:loa";
-    claimValues.family_name = userData.eidas.FamilyName;
-    claimValues.given_name = userData.eidas.GivenName;
-    claimValues.date_of_birth = userData.eidas.DateOfBirth;
-    claimValues.person_identifier = userData.eidas.PersonIdentifier;
-    claimValues.loa = userData.eidas.LevelOfAssurance;
-    if (credType.indexOf(vcTypes.aegean) >= 0) {
-      claimValues.affiliation = userData.eidas.affiliation;
-      claimValues.hostingInstitution = userData.eidas.hostingInstitution;
-      claimValues.starts = userData.eidas.starts;
-      claimValues.expires = userData.eidas.expires;
-    }
-  }
-  if (credType.indexOf(vcTypes.edugain) >= 0) {
-    simpleExampleCredMetadata.context[0].family_name = "schema:familyName";
-    simpleExampleCredMetadata.context[0].given_name = "schema:name";
-    simpleExampleCredMetadata.context[0].date_of_birth = "schema:brithDate";
-    simpleExampleCredMetadata.context[0].person_identifier = "schema:Person";
-    simpleExampleCredMetadata.context[0].loa = "schema:loa";
-    claimValues.cn = userData.edugain.cn;
-    claimValues.eduOrgHomePageURI = userData.edugain.eduOrgHomePageURI;
-    claimValues.eduOrgLegalName = userData.edugain.eduOrgLegalName;
-    claimValues.eduOrgPostalAddress = userData.edugain.eduOrgPostalAddress;
-    claimValues.l = userData.edugain.l;
-    claimValues.schacExpiryDate = userData.edugain.schacExpiryDate;
-    claimValues.schacHomeOrganization = userData.edugain.schacHomeOrganization;
-    claimValues.eduPersonAffiliation = userData.edugain.eduPersonAffiliation;
-    claimValues.eduPersonPrincipalName =
-      userData.edugain.eduPersonPrincipalName;
-    claimValues.eduPersonPrincipalNamePrior =
-      userData.edugain.eduPersonPrincipalNamePrior;
-    claimValues.eduPersonOrgUnitDN = userData.edugain.eduPersonOrgUnitDN;
-    claimValues.eduPersonUniqueId = userData.edugain.eduPersonUniqueId;
-    claimValues.displayName = userData.edugain.displayName;
-    claimValues.givenName = userData.edugain.givenName;
-    claimValues.mail = userData.edugain.mail;
-    claimValues.mobile = userData.edugain.mobile;
-    claimValues.o = userData.edugain.o;
-    claimValues.sn = userData.edugain.sn;
-    claimValues.schacPersonalUniqueCode =
-      userData.edugain.schacPersonalUniqueCode;
-    claimValues.schacPersonalUniqueID = userData.edugain.schacPersonalUniqueID;
-    claimValues.eduPersonTargetedID = userData.edugain.eduPersonTargetedID;
-  }
+
+  simpleExampleCredMetadata.context[0].family_name = "schema:familyName";
+  simpleExampleCredMetadata.context[0].given_name = "schema:name";
+  simpleExampleCredMetadata.context[0].legal_name = "schema:legal_name";
+  simpleExampleCredMetadata.context[0].legal_person_identifier =
+    "schema:legal_person_identifier";
+  simpleExampleCredMetadata.context[0].business_role = "schema:business_role";
+  simpleExampleCredMetadata.context[0].address = "schema:address";
+  simpleExampleCredMetadata.context[0].lei = "schema:lei";
+  simpleExampleCredMetadata.context[0].vat_registration =
+    "schema:vat_registration";
+  simpleExampleCredMetadata.context[0].birthdate = "schema:birthdate";
+  simpleExampleCredMetadata.context[0].trading_status = "schema:trading_status";
+  simpleExampleCredMetadata.context[0].personal_number = "schema:Person";
+  simpleExampleCredMetadata.context[0].sub_jurisdiction =
+    "schema:sub_jurisdiction";
+
+  if (userData.family_name) claimValues.family_name = userData.family_name;
+  if (userData.given_name) claimValues.given_name = userData.given_name;
+  if (userData.legal_name) claimValues.legal_name = userData.legal_name;
+  if (userData.legal_person_identifier)
+    claimValues.legal_person_identifier = userData.legal_person_identifier;
+  if (userData.business_role)
+    claimValues.business_role = userData.business_role;
+  if (userData.address) claimValues.address = userData.address;
+  if (userData.lei) claimValues.lei = userData.lei;
+  if (userData.vat_registration)
+    claimValues.vat_registration = userData.vat_registration;
+  if (userData.birthdate) claimValues.birthdate = userData.birthdate;
+  if (userData.trading_status)
+    claimValues.trading_status = userData.trading_status;
+  if (userData.personal_number)
+    claimValues.personal_number = userData.personal_number;
+  if (userData.sub_jurisdiction)
+    claimValues.sub_jurisdiction = userData.sub_jurisdiction;
 
   const offeredCredential = await issuerAgent.signedCredential(
     {
@@ -230,8 +272,9 @@ const makeVC = async (
       ])
     ).encode(),
   };
-  console.log(credentialOffer)
-  return  credentialOffer
+  console.log("jolocomService.js makeVC:: the credential VC is");
+  console.log(credentialOffer);
+  return credentialOffer;
 };
 
 export {

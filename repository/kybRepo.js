@@ -61,7 +61,7 @@ function getUserByeIDASIdenitifier(personalIdentifier) {
   return new Promise((resolve, reject) => {
     Kyb.findOne(
       {
-        legal_person_identifier: personalIdentifier,
+        personal_number: personalIdentifier,
         provider: "local",
       },
       function (err, kyb) {

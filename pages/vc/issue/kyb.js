@@ -46,7 +46,7 @@ class IssueKYB extends React.Component {
       reduxStore.dispatch(setBaseUrl(baseUrl));
       reduxStore.dispatch(setServerSessionId(req.session.sessionId));
       reduxStore.dispatch(setSessionId(req.session.sessionId));
-      DIDOk = true//req.session.DID;
+      DIDOk = req.session.DID;
       sessionId = req.session.sessionId;
     }
 
