@@ -5,7 +5,6 @@ import {
   issueEidas,
   handleIssueEidasResponse,
   issueMyID,
-  kybWizard,
   companySelection,
   startLogin,
   validateRelationship,
@@ -13,6 +12,7 @@ import {
   issueKYB,
   issueVcKYBResponse,
 } from "./controllers/views-controllers";
+import { startKompanyLogin, kompanyProcceed } from "./controllers/kompanyControllers";
 import {
   startSession,
   makeEidasRedirectionToken,
@@ -24,16 +24,16 @@ import {
   handleVCRequestController,
   handleVCResponseController,
 } from "./controllers/jolocom-api-controller";
-import {sendEmailVCInvite} from "./controllers/emailControllers"
+import { sendEmailVCInvite } from "./controllers/emailControllers";
 import { jwksController } from "./controllers/jwks-controllers";
 import { addToRegistry } from "./controllers/registryControllers";
 import { subscribe } from "./services/sse-service";
-import {searchDbController} from "./controllers/seach-db-controllers";
+import { searchDbController } from "./controllers/seach-db-controllers";
 import mongoose from "mongoose";
 
 // import winston from "winston";
 // import expressWinston from "express-winston";
-
+const cors = require("cors");
 const KeycloakMultiRealm = require("./config/KeycloakMultiRealm");
 const express = require("express");
 const https = require("https");
@@ -132,9 +132,15 @@ app.prepare().then(async () => {
   //issueVcKYBResponse
   server.get(["/vc/issue/kybResponse"], async (req, res) => {
     console.log("/vc/issue/kybResponse");
-    return issueVcKYBResponse(app, req, res,  serverConfiguration.endpoint, serverPassport, oidcClient);
+    return issueVcKYBResponse(
+      app,
+      req,
+      res,
+      serverConfiguration.endpoint,
+      serverPassport,
+      oidcClient
+    );
   });
-
 
   server.get(["/vc/issue/eidas"], async (req, res) => {
     console.log("/vc/issue/eidas");
@@ -165,14 +171,14 @@ app.prepare().then(async () => {
 
   // registry
   server.post(["/registry/add"], async (req, res) => {
-    console.log("/registry/add");  
-    await addToRegistry(req,res);
+    console.log("/registry/add");
+    await addToRegistry(req, res);
   });
 
   //email
   server.post(["/email/send"], async (req, res) => {
-    console.log("/email/send");  
-    await sendEmailVCInvite(req,res);
+    console.log("/email/send");
+    await sendEmailVCInvite(req, res);
   });
 
   // //seal
@@ -228,6 +234,16 @@ app.prepare().then(async () => {
     handleVCResponseController(req, res, issuerAgent);
   });
 
+  // kompany helpers
+  server.post(["/kompany-start-login"], cors(), async (req, res) => {
+    console.log("/kompany-start-login");
+    startKompanyLogin(app, req, res, serverPassport, oidcClient);
+  });
+  server.get(["/kompany/proceed"], async (req, res) => {
+    console.log("/kompany/proceed");
+    kompanyProcceed(app, req, res);
+  });
+
   // this call needs to be on the end of the config as, the handle(*,*) must be last
   // otherwise the rest of the controllers are ignored
   let { endpoint, passport, client } = await configServer(
@@ -245,7 +261,7 @@ app.prepare().then(async () => {
 
   server.use("/jwks", jwksController);
   server.use("/query", searchDbController);
-  server.use('/jwks', jwksController);
+  server.use("/jwks", jwksController);
   server.all("*", async (req, res) => {
     return handle(req, res);
   });

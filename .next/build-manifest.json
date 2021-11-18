@@ -23,11 +23,6 @@
       "static/chunks/main.js",
       "static/chunks/webpack.js",
       "static/chunks/pages/_error.js"
-    ],
-    "/vc/issue/kyb": [
-      "static/chunks/main.js",
-      "static/chunks/webpack.js",
-      "static/chunks/pages/vc/issue/kyb.js"
     ]
   },
   "ampFirstPages": []

@@ -152,7 +152,7 @@ const getConfiguredPassport = async (
   router.get(
     "/callback",
     async (req, res, next) => {
-      // console.log(req.session)
+      // console.log(req)
       // console.log("***************")
       // console.log(req.sessionStore.sessions)
       // console.log(req.sessionStore.sessions)
@@ -184,6 +184,13 @@ const getConfiguredPassport = async (
           ? "/validate-relation"
           : `/vc/issue/kybResponse?sessionId=${req.cookies.kyb}`;
 
+      let kompanySessionId = req.cookies.kompanySessionId
+      if(kompanySessionId){
+        console.log("passport.js will go to kompany redirect for with user details (req.user):")
+        console.log(req.user)
+        redirect_uri = `/kompany/proceed?sessionId=${sessionId}`
+      }
+
       if (req.cookies.kyb !== "false") {
         let personalIdentifier = req.user.personal_number;
         console.log(
@@ -194,17 +201,19 @@ const getConfiguredPassport = async (
         //if not found then error
         let userFound = await getUserByeIDASIdenitifier(personalIdentifier);
         if (!userFound) {
-          console.log("no user found in mongo. This means that the user is not registerd so will display error")
+          console.log(
+            "no user found in mongo. This means that the user is not registerd so will display error"
+          );
           redirect_uri = "/userNotFound";
         } else {
           console.log(
             `founda mathcing user in the public registry for ${personalIdentifier} will add to session ${sessionId}`
           );
-          setOrUpdateSessionData(sessionId,"kybProfile",userFound)
+          setOrUpdateSessionData(sessionId, "kybProfile", userFound);
         }
       }
 
-      console.log(`will redirect to ${redirect_uri}`);
+      console.log(`passport.js:: will redirect to ${redirect_uri}`);
       res.redirect(redirect_uri);
     }
   );
@@ -235,26 +244,84 @@ function getDataFromDPs(_user_info_request, _user_info_port, accessToken) {
         const resJson = JSON.parse(body.toString());
         console.log(resJson);
         console.log("******* USER INFO END **********************");
-        //TODO consolidate many sources!!
-        if (resJson._claim_sources.src1) {
-          try {
-            let claimsFromDPs = await sendToken(
-              resJson._claim_sources.src1.access_token,
-              resJson._claim_sources.src1.endpoint
-            );
-            resolve(claimsFromDPs);
-          } catch (err) {
-            console.log("error in try of getDataFromDPs");
-            console.log(err);
-            reject(err);
-          }
-        } else {
-          reject({ error: "no claim sources found in response" });
-        }
+        consolidateDPAnswers(reject, resolve, resJson);
       });
     });
     httpsReq.end();
   });
+}
+
+async function consolidateDPAnswers(reject, resolve, resJson) {
+  let src1Claims = null;
+  let src2Claims = null;
+  let src1Err = null;
+  let src2Err = null;
+
+  if (resJson._claim_sources.src1) {
+    try {
+      src1Claims = await sendToken(
+        resJson._claim_sources.src1.access_token,
+        resJson._claim_sources.src1.endpoint
+      );
+    } catch (err) {
+      console.log(
+        "passport.js:: ConsolidateDPAnswers: error in try of getDataFromDPs, src1"
+      );
+      console.log(err);
+      src1Err = err;
+    }
+  }
+  if (resJson._claim_sources.src2) {
+    try {
+      src2Claims = await sendToken(
+        resJson._claim_sources.src1.access_token,
+        resJson._claim_sources.src1.endpoint
+      );
+    } catch (err) {
+      console.log(
+        "passport.js:: ConsolidateDPAnswers: error in try of getDataFromDPs, src2"
+      );
+      console.log(err);
+      src2Err = err;
+    }
+  }
+
+  if (
+    (src1Err && src2Err) ||
+    (src1Err && !resJson._claim_sources.src2) ||
+    (src2Err && !resJson._claim_sources.src1)
+  ) {
+    let errResponse =
+      src1Err && src2Err
+        ? src1Err + " " + src2Err
+        : src1Err
+        ? src1Err
+        : src2Err;
+    reject(errResponse);
+  }
+  if (src1Claims === null && src2Claims === null) {
+    reject("No connected Data Providers can provide the requested info");
+  } else {
+    if (src1Claims && src2Claims) {
+      let merged = {};
+      Object.entries(src1Claims).forEach((entry) => {
+        let [key, value] = entry;
+        if (src1Claims[key] && src2Claims[key]) {
+          merged[key] = [src1Claims[key], src2Claims[key]];
+        }
+        if (src1Claims[key] && !src2Claims[key]) {
+          merged[key] = src1Claims[key];
+        }
+        if (src2Claims[key] && !src1Claims[key]) {
+          merged[key] = src2Claims[key];
+        }
+        resolve(merged);
+      });
+    } else {
+      if (src1Claims) resolve(src1Claims);
+      if (src2Claims) resolve(src2Claims);
+    }
+  }
 }
 
 async function sendToken(accessToken, endpoint) {
@@ -288,8 +355,8 @@ async function sendToken(accessToken, endpoint) {
         const ks = fs.readFileSync("keys.json");
         jose.JWK.asKeyStore(ks.toString()).then(async (keyStore) => {
           //decrypt received data
-          // console.log("===========>Response from DP::");
-          // console.log(payload);
+          console.log("===========>Response from DP::");
+          console.log(payload);
           let errorPayload = {};
           try {
             errorPayload = JSON.parse(payload);
@@ -300,10 +367,9 @@ async function sendToken(accessToken, endpoint) {
             console.log(
               "passport.js no payload was found, empty string returned"
             );
-            resolve();
+            reject("DP replied with an empty response");
           } else {
             if (errorPayload.error) {
-              console.log("will reject with error");
               console.log("will reject with error");
               reject(errorPayload.error);
             } else {
@@ -314,6 +380,7 @@ async function sendToken(accessToken, endpoint) {
               const body = Buffer.from(decrypted.plaintext);
               const resJson = JSON.parse(body.toString());
               console.log("******* DECRYPTED DP RESPONSE**************");
+              console.log(resJson)
               resJson.verified_claims.verified_claims.forEach((element) => {
                 console.log("verified claim found");
                 console.log(element);
@@ -324,7 +391,12 @@ async function sendToken(accessToken, endpoint) {
               // add decrypted data to database
               //
               // repo.addDataToDb(resJson.verified_claims.verified_claims[0].claims);
-              resolve(resJson.verified_claims.verified_claims[0].claims);
+              if(resJson.verified_claims.verified_claims.length > 0){
+                resolve(resJson.verified_claims.verified_claims[0].claims);
+              }else{
+                reject("No Company data returned from the Data Provider " + resJson.iss)
+              }
+              
             }
           }
         });
