@@ -2,34 +2,25 @@ import { getSessionConfg, getCacheStore } from "./config/sessionConf";
 import { configServer } from "./config/serverConfig";
 import { initAgent } from "./config/jolocomAgent";
 import {
-  issueEidas,
-  handleIssueEidasResponse,
-  issueMyID,
-  companySelection,
-  startLogin,
-  validateRelationship,
-  registryPrompt,
-  issueKYB,
-  issueVcKYBResponse,
+  landingPage,
+  verifyUserDetailsPage,
+  ticketInfo,
+  issueServiceCard
 } from "./controllers/views-controllers";
-import { startKompanyLogin, kompanyProcceed } from "./controllers/kompanyControllers";
-import {
-  startSession,
-  makeEidasRedirectionToken,
-  updateSession,
-} from "./controllers/seal-api-controllers";
+
+import { saveUserToDB } from "./controllers/dBControllers";
+
 import {
   makeConnectionRequestController,
   handleConnectionResponse,
   handleVCRequestController,
   handleVCResponseController,
 } from "./controllers/jolocom-api-controller";
+import { fetchTicketDetails, fetchCrewDetails } from "./controllers/ShipITControllers";
 import { sendEmailVCInvite } from "./controllers/emailControllers";
 import { jwksController } from "./controllers/jwks-controllers";
-import { addToRegistry } from "./controllers/registryControllers";
 import { subscribe } from "./services/sse-service";
 import { searchDbController } from "./controllers/seach-db-controllers";
-import mongoose from "mongoose";
 
 // import winston from "winston";
 // import expressWinston from "express-winston";
@@ -105,120 +96,79 @@ app.prepare().then(async () => {
   //CONTROLLERS
 
   //sse
-  server.get("/events", subscribe);
+  server.get(["/events", "/palaemon/events"], subscribe);
 
   //view
-  server.get(["/company-selection"], async (req, res) => {
-    console.log("/company-selection");
-    return companySelection(app, req, res, serverConfiguration.endpoint);
-  });
-  server.post(["/start-login"], async (req, res) => {
-    console.log("/start-login");
-    startLogin(app, req, res, serverPassport, oidcClient);
-  });
-  server.get(["/validate-relation"], async (req, res) => {
-    console.log("/validate-relation");
-    return validateRelationship(app, req, res, serverConfiguration.endpoint);
-  });
-  server.get(["/kyb/registry-prompt"], async (req, res) => {
-    console.log("/kyb/registry-prompt");
-    return registryPrompt(app, req, res, serverConfiguration.endpoint);
-  });
-  // view VC controllers
-  server.get(["/vc/issue/kyb"], async (req, res) => {
-    console.log("/vc/issue/kyb");
-    return issueKYB(app, req, res, serverPassport, oidcClient);
-  });
-  //issueVcKYBResponse
-  server.get(["/vc/issue/kybResponse"], async (req, res) => {
-    console.log("/vc/issue/kybResponse");
-    return issueVcKYBResponse(
-      app,
-      req,
-      res,
-      serverConfiguration.endpoint,
-      serverPassport,
-      oidcClient
-    );
+  server.get(["/", "/register"], async (req, res) => {
+    console.log("/register");
+    return landingPage(app, req, res, serverConfiguration.endpoint);
   });
 
-  server.get(["/vc/issue/eidas"], async (req, res) => {
-    console.log("/vc/issue/eidas");
-    return issueEidas(app, req, res, serverConfiguration.endpoint);
-  });
-  server.post(["/vc/issue/eidas/response"], async (req, res) => {
-    console.log("vc/issue/eidas/response");
-    return handleIssueEidasResponse(
-      app,
-      req,
-      res,
-      serverConfiguration.endpoint
-    );
-  });
-  server.get(["/vc/issue/myID"], async (req, res) => {
-    console.log("/vc/issue/myID");
-    return issueMyID(app, req, res, serverConfiguration.endpoint);
-  });
-  server.post(["/vc/issue/myID/response"], async (req, res) => {
-    console.log("vc/issue/eidas/response");
-    return handleIssueEidasResponse(
-      app,
-      req,
-      res,
-      serverConfiguration.endpoint
-    );
+  server.get(["/login_success"], async (req, res) => {
+    console.log("/login_success");
+    // console.log(req.session.passport.user)
+    return verifyUserDetailsPage(app, req, res, serverConfiguration.endpoint);
   });
 
-  // registry
-  server.post(["/registry/add"], async (req, res) => {
-    console.log("/registry/add");
-    await addToRegistry(req, res);
+  server.get(["/ticketInfo"], async (req, res) => {
+    console.log("/ticketInfo");
+    // console.log(req.session.passport.user)
+    return ticketInfo(app, req, res, serverConfiguration.endpoint);
   });
 
-  //email
-  server.post(["/email/send"], async (req, res) => {
-    console.log("/email/send");
-    await sendEmailVCInvite(req, res);
+  server.get(["/issue_card", "/issue"], async (req, res) => {
+    console.log("/issue");
+    console.log(req.session.passport.user); //works ok to fetch the userdetails
+    issueServiceCard(app, req, res, serverConfiguration.endpoint);
   });
 
-  // //seal
-  // server.post(["/seal/start-session"], async (req, res) => {
-  //   console.log("/seal/start-session");
-  //   await startSession(app, req, res, serverConfiguration.endpoint);
-  // });
-  // server.get(["/seal/make-eidas-token"], async (req, res) => {
-  //   console.log("/seal/make-eidas-token");
-  //   res.send(
-  //     await makeEidasRedirectionToken(req, res, serverConfiguration.endpoint)
-  //   );
-  // });
-  // server.post(["/seal/update-session"], async (req, res) => {
-  //   console.log("/seal/update-session ");
-  //   res.send(await updateSession(req, res, serverConfiguration.endpoint));
-  // });
+  //ticketing system
+  server.post(["/getTicketInfo"], async (req, res) => {
+    console.log("/getTicketInfo");
+    return fetchTicketDetails(req, res);
+  });
 
+  server.post(["/getCrewDetails"], async (req, res) => {
+    console.log("/getCrewDetails");
+    return fetchCrewDetails(req, res);
+  });
+
+  //data-base api
+  server.post(["/storeUser"], async (req, res) => {
+    console.log("/storeUser");
+    saveUserToDB(req, res);
+  });
+
+  // **********************************
+   
   // session
-  server.post(["/start-session"], async (req, res) => {
+  server.post(["/start-session", "/palaemon/start-session"], async (req, res) => {
     console.log("/start-session");
     await startSession(app, req, res, serverConfiguration.endpoint);
   });
-  server.post(["/update-session"], async (req, res) => {
+  server.post(["/update-session", "/palaemon/update-session"], async (req, res) => {
     console.log("/update-session ");
     res.send(await updateSession(req, res, serverConfiguration.endpoint));
   });
 
   //jolo
-  server.post(["/makeConnectionRequest"], async (req, res) => {
-    console.log("/makeConnectionRequest");
-    makeConnectionRequestController(req, res, issuerAgent);
-  });
+  server.post(
+    ["/makeConnectionRequest", "/palaemon/makeConnectionRequest"],
+    async (req, res) => {
+      console.log("/makeConnectionRequest");
+      makeConnectionRequestController(req, res, issuerAgent);
+    }
+  );
 
-  server.post(["/connectionResponse"], async (req, res) => {
-    console.log("/connectionResponse");
-    handleConnectionResponse(req, res, issuerAgent);
-  });
+  server.post(
+    ["/connectionResponse", "/palaemon/connectionResponse"],
+    async (req, res) => {
+      console.log("/connectionResponse");
+      handleConnectionResponse(req, res, issuerAgent);
+    }
+  );
 
-  server.post(["/issueVC"], async (req, res) => {
+  server.post(["/issueVC", "/palaemon/issueVC"], async (req, res) => {
     console.log("/issueVC");
     // console.log(req.body)
     handleVCRequestController(
@@ -229,19 +179,9 @@ app.prepare().then(async () => {
     );
   });
 
-  server.post(["/offerResponse"], async (req, res) => {
+  server.post(["/offerResponse", "/palaemon/offerResponse"], async (req, res) => {
     console.log("/offerResponse");
     handleVCResponseController(req, res, issuerAgent);
-  });
-
-  // kompany helpers
-  server.post(["/kompany-start-login"], cors(), async (req, res) => {
-    console.log("/kompany-start-login");
-    startKompanyLogin(app, req, res, serverPassport, oidcClient);
-  });
-  server.get(["/kompany/proceed"], async (req, res) => {
-    console.log("/kompany/proceed");
-    kompanyProcceed(app, req, res);
   });
 
   // this call needs to be on the end of the config as, the handle(*,*) must be last

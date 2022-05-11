@@ -1,9 +1,9 @@
-import { Button } from "react-bootstrap";
+import Button from "@mui/material/Button";
 import React from "react";
 import { connect } from "react-redux";
 import { requestVC } from "../store";
 import isMobile from "../utils/isMobile";
-import IssueVCButtonUI from "../components/CustomButtons/IssueVCButton"
+import IssueVCButtonUI from "../components/CustomButtons/IssueVCButton";
 
 class IssueVCButton extends React.Component {
   constructor(props) {
@@ -12,7 +12,7 @@ class IssueVCButton extends React.Component {
     this.session = props.session;
     this.hasRequiredAttributes = props.hasRequiredAttributes;
     this.vcIssuanceEndpoint = props.vcIssuanceEndpoint;
-    this.vcType= props.vcType
+    this.vcType = props.vcType;
     this.click = this.click.bind(this);
   }
 
@@ -20,10 +20,8 @@ class IssueVCButton extends React.Component {
 
   click() {
     const vcType = this.props.vcType;
-    console.log("issueVCButton:: click called with " + this.props.uuid)
-    let url = this.props.baseUrl
-      ? `${this.props.baseUrl}issueVC`
-      : `/issueVC`;
+    console.log("issueVCButton:: click called with " + this.props.uuid);
+    let url = this.props.baseUrl ? `${this.props.baseUrl}issueVC` : `/issueVC`;
     console.log(
       `will send request for ${url} with  type ${vcType} isMobile ${isMobile()}`
     );
@@ -32,13 +30,21 @@ class IssueVCButton extends React.Component {
 
   render() {
     return (
-      <IssueVCButtonUI
-        variant="primary"
-        disabled={!this.props.hasRequiredAttributes}
+      // <IssueVCButtonUI
+      //   variant="primary"
+      //   disabled={!this.props.hasRequiredAttributes}
+      //   onClick={this.click}
+      //   color="primary" size="lg"
+      // />
+      <Button
+        variant="contained"
+        size="large"
         onClick={this.click}
-        color="primary" size="lg" 
-      />
-       
+        disabled={!this.props.hasRequiredAttributes}
+      >
+        Issue Verifiable Credential
+      </Button>
+
       // </Link>
     );
   }
@@ -46,15 +52,15 @@ class IssueVCButton extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    status: state.sessionStatus
+    status: state.sessionStatus,
   };
 }
 
-const mapDispatchToProps = dispatch => {
+const mapDispatchToProps = (dispatch) => {
   return {
-    requestVC: (url,vcType, uuid, isMobile) => {
+    requestVC: (url, vcType, uuid, isMobile) => {
       dispatch(requestVC(url, vcType, uuid, isMobile));
-    }
+    },
   };
 };
 

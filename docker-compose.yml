@@ -4,37 +4,24 @@ services:
    redis:
     image: "redis:alpine"
     command: redis-server 
-    # volumes:
-    #  - $PWD/redis-data:/var/lib/redis
-    #   - $PWD/redis.conf:/usr/local/etc/redis/redis.conf
     environment:
      - REDIS_REPLICATION_MODE=master
     ports:
      - "6379:6379"
 
-   kyb:
-    image: endimion13/grids-kyb-custodian:0.0.1a
+   palaemon:
+    image: endimion13/palaemon-registration:0.0.1c
     environment:
       NODE_ENV: "production"
-      ENDPOINT: http://localhost:5050
+      ENDPOINT: http://localhost:5040
       HTTPS_COOKIES: "false"
-      MEMCACHED_URL: memcached:11211
       REDIS: redis
+      ISSUER_URL: https://dss1.aegean.gr/auth/realms/grnetEidas
+      OIDC_REDIRECT_URI: http://localhost:5040/login/callback
+      VC_REDIRECT_URI: http://localhost:5000/vc/response/kyb
+      PORT: 5000
+      DB_PROXY_URL: http://3851-2001-648-2000-cd-82fa-fe82-898-62eb.ngrok.io 
       # BASE_PATH: "issuer"
-      ISSUER_URL: "https://vm.project-grids.eu:8180/auth/realms/grids"
-      OIDC_REDIRECT_URI: "http://localhost:5050/login/callback"
-      VC_REDIRECT_URI: "http://localhost:5050/vc/response/kyb"
-      USER_INFO: "vm.project-grids.eu"
-      USER_INFO_PORT: "8180"
-      MONGO: "mongodb+srv://root:root@cluster0.vtgm8.mongodb.net/KYB_CUSTODIAN?retryWrites=true&w=majority"
-      TTL: "300"
-      KEYCLOAK_REDIRECT_URI: "http://localhost:8081/auth/realms/kyb/rest/kybResponse"
-      ISSUE_REDIRECT_URI: "http://localhost:5050/vc/response/kyb"
-      JWKS_URI: "http://localhost:5050/jwks"
-      CERT_PASS: "pass"
-      LINK_REQ_END: http://vm.project-seal.eu:9050/link/request/submit
-    volumes: 
-      - /home/nikos/uPort/uportFullStack/uport-full-stack:/certs
     ports:
-      - 5050:5000
+      - 5040:5000
 

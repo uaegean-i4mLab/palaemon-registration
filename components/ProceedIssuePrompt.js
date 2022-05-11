@@ -1,55 +1,95 @@
-import QrPrompt from "./QrPrompt";
-import SSE from "./Sse.js";
-import GridContainer from "./Grid/GridContainer";
-import GridItem from "./Grid/GridItem";
+import * as React from "react";
+import { styled, alpha } from "@mui/material/styles";
+//AppBar
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Toolbar from "@mui/material/Toolbar";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import InputBase from "@mui/material/InputBase";
+import Badge from "@mui/material/Badge";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import MenuIcon from "@mui/icons-material/Menu";
+import SearchIcon from "@mui/icons-material/Search";
+import AccountCircle from "@mui/icons-material/AccountCircle";
+import MailIcon from "@mui/icons-material/Mail";
+import NotificationsIcon from "@mui/icons-material/Notifications";
+import MoreIcon from "@mui/icons-material/MoreVert";
+//Stepper
+import Stepper from "@mui/material/Stepper";
+import Step from "@mui/material/Step";
+import StepLabel from "@mui/material/StepLabel";
+import Button from "@mui/material/Button";
+import Container from "@mui/material/Container";
+
+import Grid from "@mui/material/Grid";
+
+//Card
+import Card from "@mui/material/Card";
+import CardActions from "@mui/material/CardActions";
+import CardContent from "@mui/material/CardContent";
+
+//Forms
+import FormControl from "@mui/material/FormControl";
+import FormHelperText from "@mui/material/FormHelperText";
+import Input from "@mui/material/Input";
+import InputLabel from "@mui/material/InputLabel";
+import TextField from "@mui/material/TextField";
+import Select from "@mui/material/Select";
+import Divider from "@mui/material/Divider";
+
+//Icons
+import InfoIcon from "@mui/icons-material/Info";
+import Tooltip from "@mui/material/Tooltip";
+import DriveFileRenameOutlineIcon from "@mui/icons-material/DriveFileRenameOutline";
+import DoneAllIcon from "@mui/icons-material/DoneAll";
+
+//Table
+import Table from "@mui/material/Table";
+import TableBody from "@mui/material/TableBody";
+import TableCell from "@mui/material/TableCell";
+import TableContainer from "@mui/material/TableContainer";
+import TableHead from "@mui/material/TableHead";
+import TableRow from "@mui/material/TableRow";
+import Paper from "@mui/material/Paper";
+
 import IssueVCButton from "./IssueVCButton";
 
+
 const ProceedIssuePrompt = (props) => {
+
+  // Jolocom Wallet connected succesfully
+
   return (
-    <GridContainer>
-      <GridItem xs={12} sm={12} md={8}>
-        <h2
-          class="MuiTypography-root MuiTypography-h3"
-          style={{
-            color: "#4d4d4d",
-            padding: "8px 0px 0px",
-            fontWeight: "normal",
-          }}
-        >
-          Jolocom Wallet connected succesfully
-        </h2>
-        <h1
-          style={{
-            margin: "0px 0px 48px 0px",
-            marginTop: "0px",
-            marginRight: "0px",
-            marginBottom: "30px",
-            marginLeft: "0px",
-            fontSize: "2rem",
-          }}
-        >
-          Proceed to Issue your Portable KYB Credential
-        </h1>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={8} style={{ textAlign: "center" }}>
-        <p
-          className="MuiTypography-root  MuiTypography-body1"
-          style={{ fontSize: "1.1429rem", textAlign: "left" }}
-        >
-          Click the following button to generate your KYB Profile Verifiable
-          Credential. Next, scan the generated QR code to receive the VC on your
-          mobile wallet app.
-        </p>
-      </GridItem>
-      <GridItem xs={12} sm={12} md={8} style={{ textAlign: "center" }}>
-        <IssueVCButton
-          hasRequiredAttributes={props.hasRequiredAttributes}
-          baseUrl={props.baseUrl}
-          uuid={props.uuid}
-          vcType={props.vcType}
-        />
-      </GridItem>
-    </GridContainer>
+    <React.Fragment>
+    <>
+      <Typography variant="body1" sx={{ fontWeight: 300 }} style={{marginTop: "3rem"}}>
+        Jolocom Wallet connected succesfully
+      </Typography>
+      <Typography variant="h5" sx={{ mt: 1, fontWeight: 300 }}>
+        Proceed to Issue your Portable KYB Credential
+      </Typography>
+      <Typography variant="body1" sx={{ my: 3, fontWeight: 300 }}>
+        {" "}
+        Click the following button to generate your "Palaemon Service Card"
+        Credential. Next, scan the generated QR code to receive it on your
+        mobile wallet app.
+      </Typography>
+      <img src="/cred.svg" width="200px" alt="credentials" />
+    </>
+    {/* <Button variant="contained" size="large" onClick={handleNext}>
+      Issue Verifiable Credential
+    </Button> */}
+    <Box style={{ flexDirection: "row", paddingTop: "32px" }}>
+      <IssueVCButton
+        hasRequiredAttributes={props.hasRequiredAttributes}
+        baseUrl={props.baseUrl}
+        uuid={props.uuid}
+        vcType={props.vcType}
+      />
+    </Box>
+  </React.Fragment>
   );
 };
 

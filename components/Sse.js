@@ -33,6 +33,7 @@ class SSE extends React.Component {
             );
             if(eventData.status ==="connected"){
               this.props.didAuthOK(eventData.uuid, this.props.sealSession);
+              this.props.onConnected()
 
             }
             if(eventData.status==="sent"){
